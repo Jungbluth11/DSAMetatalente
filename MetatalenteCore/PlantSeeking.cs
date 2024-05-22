@@ -5,7 +5,7 @@ namespace Metatalente.Core
     public class PlantSeeking : MetatalentBase
     {
         private readonly Random random = new();
-        public bool Coincidence { get; set; } = true;
+        public bool Coincidence { get; set; } = false;
         public Plant CurrentPlant { get; set; } = Plants[0];
 
         #region hard coded data
@@ -145,6 +145,7 @@ namespace Metatalente.Core
             {
                 rolldata = Roll(core.MU, core.IN, core.GE, mod, skillpoints);
                 pointsLeft = rolldata.pointsResult;
+                pointsLeft = 20;
                 bool canFind = true;
                 List<Plant> PlantsLootTable = new();
                 List<ResultData> Results = new();

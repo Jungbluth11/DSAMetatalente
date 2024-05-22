@@ -25,7 +25,7 @@ namespace Metatalente.Core
         }
         public bool IsScharfschuetze { get; set; }
         public bool IsMeisterschuetze { get; set; }
-        public bool Coincidence { get; set; } = true;
+        public bool Coincidence { get; set; } = false;
         public enum Variants
         {
             Pirschjagd,
