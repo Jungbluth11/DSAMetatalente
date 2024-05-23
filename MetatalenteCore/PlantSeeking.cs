@@ -145,7 +145,6 @@ namespace Metatalente.Core
             {
                 rolldata = Roll(core.MU, core.IN, core.GE, mod, skillpoints);
                 pointsLeft = rolldata.pointsResult;
-                pointsLeft = 20;
                 bool canFind = true;
                 List<Plant> PlantsLootTable = new();
                 List<ResultData> Results = new();
