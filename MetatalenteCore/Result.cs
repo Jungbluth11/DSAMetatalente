@@ -1,16 +1,9 @@
 ﻿namespace Metatalente.Core
 {
-    public struct Result
+    public readonly struct Result(string pointsLeft, string diceResult, string textResult)
     {
-        public string PointsLeft { get; }
-        public string DiceResult { get; }
-        public string TextResult { get; }
-
-        public Result(string pointsLeft, string diceResult, string textResult)
-        {
-            PointsLeft = pointsLeft ?? throw new ArgumentNullException(nameof(pointsLeft));
-            DiceResult = diceResult ?? throw new ArgumentNullException(nameof(diceResult));
-            TextResult = textResult ?? throw new ArgumentNullException(nameof(textResult));
-        }
+        public string PointsLeft { get; } = pointsLeft ?? throw new ArgumentNullException(nameof(pointsLeft));
+        public string DiceResult { get; } = diceResult ?? throw new ArgumentNullException(nameof(diceResult));
+        public string TextResult { get; } = textResult ?? throw new ArgumentNullException(nameof(textResult));
     }
 }

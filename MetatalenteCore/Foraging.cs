@@ -9,7 +9,7 @@
 
         public override void SetSkill()
         {
-            SetSkill(new string[] { "Wildnisleben", "Sinnenschärfe", "Pflanzenkunde" });
+            SetSkill(["Wildnisleben", "Sinnenschärfe", "Pflanzenkunde"]);
         }
 
         public override void Roll()

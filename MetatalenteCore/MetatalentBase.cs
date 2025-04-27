@@ -19,7 +19,7 @@ namespace Metatalente.Core
 
         protected void SetSkill(string[] baseSkills)
         {
-            List<int> skillValues = new List<int>();
+            List<int> skillValues = [];
             int lowest = 0;
             int sum = 0;
 

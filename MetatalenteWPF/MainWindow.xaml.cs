@@ -285,7 +285,7 @@ namespace Metatalente.WPF
                 core.CurrentLandscape = Core.Core.GetLandscape(DropdownLandscape.SelectedValue.ToString());
 #pragma warning restore CS8604
                 string? terrain = core.CurrentLandscape.Terrain;
-                StringKnownTerrain.Text = terrain == null ? string.Empty : terrain;
+                StringKnownTerrain.Text = terrain ?? string.Empty;
                 SetPlantList();
                 SetPlantDescription();
                 if (core.KnownTerrains.Length > 0 && terrain != null && core.KnownTerrains.Contains(terrain))

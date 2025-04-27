@@ -35,12 +35,12 @@
             {
                 throw new ArgumentNullException(nameof(occur));
             }
-            List<OccurData> occurData = new();
+            List<OccurData> occurData = [];
             for (int i = 0; i < landscapes.Length; i++)
             {
                 occurData.Add(new OccurData(occur[i], Core.GetLandscape(landscapes[i])));
             }
-            OccurData = occurData.ToArray();
+            OccurData = [.. occurData];
         }
     }
 }

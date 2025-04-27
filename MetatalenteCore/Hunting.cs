@@ -36,8 +36,8 @@ namespace Metatalente.Core
 
         #region hard coded data
 
-        public static Weapon[] Weapons => new Weapon[]
-        {
+        public static Weapon[] Weapons =>
+        [
             new("Wurfscheibe","Wurfmesser",20 ),
             new("Wurfring","Wurfmesser",20 ),
             new("Dschadra","Wurfspeer",40 ),
@@ -68,86 +68,86 @@ namespace Metatalente.Core
             new("Diskus","Diskus",60 ),
             new("Jagddiskus","Diskus",60 ),
             new("Kampfdiskus","Diskus",60 )
-        };
+        ];
 
-        public static Animal[] Animals => new Animal[]
-        {
-            new(15, "Löwenaffe", new string[] { "0.5 bis 2 Rationen Fleisch", "Fell (besser)" }),
-            new(15, "Moosaffe", new string[] { "0.5 bis 2 Rationen Fleisch", "Fell (besser)" }),
-            new(2, "Otan-Otan", new string[] { "bis 40 Rationen Fleisch (zäh)", "Fell (besser)" }),
-            new(15, "Purzelaffe", new string[] { "0.5 bis 2 Rationen Fleisch", "Fell (besser)" }),
-            new(5, "Riesenaffe", new string[] { "190 Rationen Fleisch (zäh)", "Fell (besser)" }),
-            new(2, "Sumpfranze", new string[] { "25 Rationen Fleisch (ungenießbar)", "Fell (wertlos)" }),
-            new(12, "Al'Kebir-Antilope", new string[] { "140 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" }),
-            new(12, "Gabelantilope", new string[] { "9 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" }),
-            new(12, "Halmar-Antilope", new string[] { "15 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" }),
-            new(10, "Karen", new string[] { "40 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (besser)" }),
-            new(12, "Springbock", new string[] { "19 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" }),
-            new(10, "Vy'Tagga-Antilope", new string[] { "15 Rationen Fleisch (ungenießbar)", "Geweih (Trophäe)", "Fell (besser) oder Leder (besser)" }),
-            new(6, "Baumbär", new string[] { "15 bis 20 Rationen Fleisch (zäh)", "Fell (teuer)" }),
-            new(12, "Baumwürger", new string[] { "30 Rationen Fleisch (zäh)", "Fell (teuer)" }),
-            new(5, "Borkenbär", new string[] { "110 Rationen Fleisch", "Fell (einfach)" }),
-            new(12, "Firunsbär", new string[] { "600 Rationen Fleisch", "Fell (Luxusartikel)" }),
-            new(6, "Höhlenbär", new string[] { "350 Rationen Fleisch", "Fell (teuer)" }),
-            new(7, "Orklandbär", new string[] { "50 Rationen Fleisch", "Fell (billig)" }),
-            new(4, "Schwarzbär", new string[] { "380 Rationen Fleisch", "Fell (Luxusartikel)" }),
-            new(9, "Schneedachs", new string[] { "5 Rationen Fleisch", "Fell (einfach)" }),
-            new(12, "Streifendachs", new string[] { "4 Rationen Fleisch", "Fell (einfach)" }),
-            new(7, "Brabaker Waldelefant", new string[] { "1500 bis 2000 Rationen Fleisch", "Haut (Leder, teuer)", "Stoßzähne (5 D je Stein / pro Zahn bis zu 15 Stein)" }),
-            new(10, "Mammut", new string[] { "2800 bis 3400 Rationen Fleisch", "Haut (Fell oder Leder, teuer)", "Stoßzähne (4 D je Stein / pro Zahn bis zu 40 Stein)" }),
-            new(8, "Mastodon", new string[] { "1600 bis 2400 Rationen Fleisch", "Haut (Fell oder Leder, teuer)", "Stoßzähne (3 D je Stein / pro Zahn bis zu 20 Stein)" }),
-            new(4, "Zwergelefant", new string[] { "500 Rationen Fleisch", "Haut (Fell oder Leder, teuer)", "Stoßzähne (3 D je Stein / pro Zahn bis zu 30 Stein)" }),
-            new(13, "Gelbfuchs", new string[] { "3 Rationen Fleisch (sehr zäh)", "Pelz (billig)" }),
-            new(9, "Rotfuchs", new string[] { "3 Rationen Fleisch (sehr zäh)", "Pelz (teuer)" }),
-            new(15, "Blaufuchs", new string[] { "3 Rationen Fleisch (sehr zäh)", "Pelz (Luxusartikel)" }),
-            new(6, "Auerhahn", new string[] { "3 Rationen Fleisch" }),
-            new(5, "Fasan", new string[] { "1 bis 2 Rationen Fleisch", "Fell (besser)" }),
-            new(5, "Regenbogenfasan", new string[] { "1 Ration Fleisch", "Fell (besser)" }),
-            new(5, "Rebhuhn", new string[] { "1 bis 2 Rationen Fleisch" }),
-            new(5, "Trappe", new string[] { "5 Rationen Fleisch" }),
-            new(7, "Karnickel", new string[] { "1 bis 2 Rationen Fleisch", "Fell (besser)" }),
-            new(7, "Orklandkarnickel", new string[] { "1 bis 2 Rationen Fleisch", "Fell (besser)" }),
-            new(7, "Pfeifhase", new string[] { "1 bis 2 Rationen Fleisch", "Fell (besser)" }),
-            new(4, "Riesenlöffler", new string[] { "2 Rationen Fleisch", "Fell (besser)" }),
-            new(12, "Rotpüschel", new string[] { "1 Ration Fleisch", "Fell (besser)" }),
-            new(10, "Silberbock", new string[] { "1 bis 2 Rationen Fleisch", "Fell (besser)" }),
-            new(4, "Elch", new string[] { "450 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" }),
-            new(8, "Firunshirsch", new string[] { "60 Rationen Fleisch", "Geweih (Trophäe)", "Fell (teuer, in reinem Weiß Luxusware) oder Leder (teuer)" }),
-            new(6, "Kronenhirsch", new string[] { "110 Rationen Fleisch", "Geweih (Trophäe)", "Fell (teuer) oder Leder (teuer)" }),
-            new(5, "Rehwild", new string[] { "11 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" }),
-            new(10, "Steppenhund", new string[] { "12 Rationen Fleisch (zäh)", "Fell (billig)" }),
-            new(20, "Wildkatze", new string[] { "3 Rationen Fleisch", "Fell (einfach)" }),
-            new(12, "Berglöwe", new string[] { "65 Rationen Fleisch", "Fell (Luxusartikel)" }),
-            new(6, "Sandlöwe", new string[] { "100 Rationen Fleisch", "Fell (Luxusartikel)" }),
-            new(12, "Lioma", new string[] { "90 Rationen Fleisch", "Fell (Luxusartikel)" }),
-            new(9, "Waldlöwe", new string[] { "60 Rationen Fleisch", "Fell (Luxusartikel)" }),
-            new(20, "Firnluchs", new string[] { "12 Rationen Fleisch", "Fell (teuer)" }),
-            new(15, "Gänseluchs", new string[] { "3 Rationen Fleisch", "Fell (einfach)" }),
-            new(15, "Raschtulsluchs", new string[] { "10 Rationen Fleisch", "Fell (besser)" }),
-            new(15, "Rotluchs", new string[] { "10 Rationen Fleisch", "Fell (besser)" }),
-            new(15, "Sonnenluchs", new string[] { "10 Rationen Fleisch", "Fell (besser)" }),
-            new(15, "Fleckenpanther", new string[] { "40 Rationen Fleisch", "Fell (Luxusartikel)" }),
-            new(15, "Khômgepard", new string[] { "15 Rationen Fleisch", "Fell (Luxusartikel)" }),
-            new(8, "Auerochse", new string[] { "550 Rationen Fleisch", "Hörner (Trophäe)", "Haut (einfach)", "Leder (teuer)" }),
-            new(7, "Firnyak", new string[] { "140 Rationen Fleisch", "Hörner (Trophäe)", "Fell (teuer, in reinem weiß Luxusware) oder Leder (teuer)" }),
-            new(4, "Ongalobulle", new string[] { "300 Rationen Fleisch", "Hörner (Trophäe)", "Haut (einfach)", "Leder (besser)" }),
-            new(12, "Steppenrind", new string[] { "600 Rationen Fleisch", "Hörner (Trophäe)", "Haut (einfach)", "Leder (teuer)" }),
-            new(8, "Meerkalb", new string[] { "bis 250 Rationen Fleisch", "Tran (5-7 D)", "Haut (Leder, besser)" }),
-            new(13, "Seetiger", new string[] { "250 bis 300 Rationen Fleisch", "Tran (12-15 D)", "Haut (Leder, besser)", "Bein (teuer)", "Ambra (3 D)" }),
-            new(10, "Dschungeltiger", new string[] { "100 Rationen Fleisch", "Fell (Luxusartikel)", "Zähne (Trophäe)" }),
-            new(10, "Silberlöwe", new string[] { "100 Rationen Fleisch", "Fell (Luxusartikel)", "Zähne (Trophäe)" }),
-            new(10, "Steppentiger", new string[] { "100 Rationen Fleisch", "Fell (Luxusartikel)", "Zähne (Trophäe)" }),
-            new(2, "Wildschwein", new string[] { "bis 130 Rationen Fleisch", "Hauer (Trophäe)", "Fell (billig) oder Leder (einfach)" }),
-            new(2, "Warzenschwein", new string[] { "bis 130 Rationen Fleisch", "Hauer (Trophäe)", "Fell (billig) oder Leder (einfach)" }),
-            new(4, "Strauß", new string[] { "50 Rationen Fleisch", "15 bis 60 Eier im Nest (jedes Ei eine Ration)", "Gefieder (teuer)" }),
-            new(6, "Vielfraß", new string[] { "8 Rationen Fleisch (ungenießbar)", "Fell (besser)" }),
-            new(5, "Baumschleimer", new string[] { "6 Rationen Fleisch (ungenießbar)", "Fell (wertlos)" }),
-            new(20, "Gebirgsbock", new string[] { "60 Rationen Fleisch (zäh)", "Fell (einfach)", "Horn (Trophäe)" }),
-            new(2, "Felsrobbe", new string[] { "bis 45 Rationen Fleisch", "Talg (Fett", "Öl", "5 S)", "Tran (1 D)", "Haut (Fell, besser, von Jungtieren teuer)" }),
-            new(7, "Maraskanisches Stachelschwein", new string[] { "1 Ration Fleisch", "2W20+30 Stacheln (FF-Probe, um sie inklusive Giftdrüse aus dem Tier zu ziehen)" }),
-            new(7, "Klippechse", new string[] { "10 Rationen Fleisch", "Haut (Leder, teuer)", "Eier (diverse alchemistische Anwendungen)" }),
-            new(5, "Schreckkatze",  new string[] { "12 Rationen Fleisch (nur für Orks und Goblins genießbar)", "Fell wertlos" })
-        };
+        public static Animal[] Animals =>
+        [
+            new(15, "Löwenaffe", ["0.5 bis 2 Rationen Fleisch", "Fell (besser)"]),
+            new(15, "Moosaffe", ["0.5 bis 2 Rationen Fleisch", "Fell (besser)"]),
+            new(2, "Otan-Otan", ["bis 40 Rationen Fleisch (zäh)", "Fell (besser)"]),
+            new(15, "Purzelaffe", ["0.5 bis 2 Rationen Fleisch", "Fell (besser)"]),
+            new(5, "Riesenaffe", ["190 Rationen Fleisch (zäh)", "Fell (besser)"]),
+            new(2, "Sumpfranze", ["25 Rationen Fleisch (ungenießbar)", "Fell (wertlos)" ]),
+            new(12, "Al'Kebir-Antilope", ["140 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" ]),
+            new(12, "Gabelantilope", ["9 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" ]),
+            new(12, "Halmar-Antilope", ["15 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" ]),
+            new(10, "Karen", ["40 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (besser)" ]),
+            new(12, "Springbock", ["19 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" ]),
+            new(10, "Vy'Tagga-Antilope", ["15 Rationen Fleisch (ungenießbar)", "Geweih (Trophäe)", "Fell (besser) oder Leder (besser)" ]),
+            new(6, "Baumbär", ["15 bis 20 Rationen Fleisch (zäh)", "Fell (teuer)" ]),
+            new(12, "Baumwürger", ["30 Rationen Fleisch (zäh)", "Fell (teuer)" ]),
+            new(5, "Borkenbär", ["110 Rationen Fleisch", "Fell (einfach)" ]),
+            new(12, "Firunsbär", ["600 Rationen Fleisch", "Fell (Luxusartikel)" ]),
+            new(6, "Höhlenbär", ["350 Rationen Fleisch", "Fell (teuer)" ]),
+            new(7, "Orklandbär", ["50 Rationen Fleisch", "Fell (billig)" ]),
+            new(4, "Schwarzbär", ["380 Rationen Fleisch", "Fell (Luxusartikel)" ]),
+            new(9, "Schneedachs", ["5 Rationen Fleisch", "Fell (einfach)" ]),
+            new(12, "Streifendachs", ["4 Rationen Fleisch", "Fell (einfach)" ]),
+            new(7, "Brabaker Waldelefant", ["1500 bis 2000 Rationen Fleisch", "Haut (Leder, teuer)", "Stoßzähne (5 D je Stein / pro Zahn bis zu 15 Stein)" ]),
+            new(10, "Mammut", ["2800 bis 3400 Rationen Fleisch", "Haut (Fell oder Leder, teuer)", "Stoßzähne (4 D je Stein / pro Zahn bis zu 40 Stein)" ]),
+            new(8, "Mastodon", ["1600 bis 2400 Rationen Fleisch", "Haut (Fell oder Leder, teuer)", "Stoßzähne (3 D je Stein / pro Zahn bis zu 20 Stein)" ]),
+            new(4, "Zwergelefant", ["500 Rationen Fleisch", "Haut (Fell oder Leder, teuer)", "Stoßzähne (3 D je Stein / pro Zahn bis zu 30 Stein)" ]),
+            new(13, "Gelbfuchs", ["3 Rationen Fleisch (sehr zäh)", "Pelz (billig)" ]),
+            new(9, "Rotfuchs", ["3 Rationen Fleisch (sehr zäh)", "Pelz (teuer)" ]),
+            new(15, "Blaufuchs", ["3 Rationen Fleisch (sehr zäh)", "Pelz (Luxusartikel)" ]),
+            new(6, "Auerhahn", ["3 Rationen Fleisch" ]),
+            new(5, "Fasan", ["1 bis 2 Rationen Fleisch", "Fell (besser)" ]),
+            new(5, "Regenbogenfasan", ["1 Ration Fleisch", "Fell (besser)" ]),
+            new(5, "Rebhuhn", ["1 bis 2 Rationen Fleisch" ]),
+            new(5, "Trappe", ["5 Rationen Fleisch" ]),
+            new(7, "Karnickel", ["1 bis 2 Rationen Fleisch", "Fell (besser)" ]),
+            new(7, "Orklandkarnickel", ["1 bis 2 Rationen Fleisch", "Fell (besser)" ]),
+            new(7, "Pfeifhase", ["1 bis 2 Rationen Fleisch", "Fell (besser)" ]),
+            new(4, "Riesenlöffler", ["2 Rationen Fleisch", "Fell (besser)" ]),
+            new(12, "Rotpüschel", ["1 Ration Fleisch", "Fell (besser)" ]),
+            new(10, "Silberbock", ["1 bis 2 Rationen Fleisch", "Fell (besser)" ]),
+            new(4, "Elch", ["450 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" ]),
+            new(8, "Firunshirsch", ["60 Rationen Fleisch", "Geweih (Trophäe)", "Fell (teuer, in reinem Weiß Luxusware) oder Leder (teuer)" ]),
+            new(6, "Kronenhirsch", ["110 Rationen Fleisch", "Geweih (Trophäe)", "Fell (teuer) oder Leder (teuer)" ]),
+            new(5, "Rehwild", ["11 Rationen Fleisch", "Geweih (Trophäe)", "Fell (besser) oder Leder (teuer)" ]),
+            new(10, "Steppenhund", ["12 Rationen Fleisch (zäh)", "Fell (billig)" ]),
+            new(20, "Wildkatze", ["3 Rationen Fleisch", "Fell (einfach)" ]),
+            new(12, "Berglöwe", ["65 Rationen Fleisch", "Fell (Luxusartikel)" ]),
+            new(6, "Sandlöwe", ["100 Rationen Fleisch", "Fell (Luxusartikel)" ]),
+            new(12, "Lioma", ["90 Rationen Fleisch", "Fell (Luxusartikel)" ]),
+            new(9, "Waldlöwe", ["60 Rationen Fleisch", "Fell (Luxusartikel)" ]),
+            new(20, "Firnluchs", ["12 Rationen Fleisch", "Fell (teuer)" ]),
+            new(15, "Gänseluchs", ["3 Rationen Fleisch", "Fell (einfach)" ]),
+            new(15, "Raschtulsluchs", ["10 Rationen Fleisch", "Fell (besser)" ]),
+            new(15, "Rotluchs", ["10 Rationen Fleisch", "Fell (besser)" ]),
+            new(15, "Sonnenluchs", ["10 Rationen Fleisch", "Fell (besser)" ]),
+            new(15, "Fleckenpanther", ["40 Rationen Fleisch", "Fell (Luxusartikel)" ]),
+            new(15, "Khômgepard", ["15 Rationen Fleisch", "Fell (Luxusartikel)" ]),
+            new(8, "Auerochse", ["550 Rationen Fleisch", "Hörner (Trophäe)", "Haut (einfach)", "Leder (teuer)" ]),
+            new(7, "Firnyak", ["140 Rationen Fleisch", "Hörner (Trophäe)", "Fell (teuer, in reinem weiß Luxusware) oder Leder (teuer)" ]),
+            new(4, "Ongalobulle", ["300 Rationen Fleisch", "Hörner (Trophäe)", "Haut (einfach)", "Leder (besser)" ]),
+            new(12, "Steppenrind", ["600 Rationen Fleisch", "Hörner (Trophäe)", "Haut (einfach)", "Leder (teuer)" ]),
+            new(8, "Meerkalb", ["bis 250 Rationen Fleisch", "Tran (5-7 D)", "Haut (Leder, besser)" ]),
+            new(13, "Seetiger", ["250 bis 300 Rationen Fleisch", "Tran (12-15 D)", "Haut (Leder, besser)", "Bein (teuer)", "Ambra (3 D)" ]),
+            new(10, "Dschungeltiger", ["100 Rationen Fleisch", "Fell (Luxusartikel)", "Zähne (Trophäe)" ]),
+            new(10, "Silberlöwe", ["100 Rationen Fleisch", "Fell (Luxusartikel)", "Zähne (Trophäe)" ]),
+            new(10, "Steppentiger", ["100 Rationen Fleisch", "Fell (Luxusartikel)", "Zähne (Trophäe)" ]),
+            new(2, "Wildschwein", ["bis 130 Rationen Fleisch", "Hauer (Trophäe)", "Fell (billig) oder Leder (einfach)" ]),
+            new(2, "Warzenschwein", ["bis 130 Rationen Fleisch", "Hauer (Trophäe)", "Fell (billig) oder Leder (einfach)" ]),
+            new(4, "Strauß", ["50 Rationen Fleisch", "15 bis 60 Eier im Nest (jedes Ei eine Ration)", "Gefieder (teuer)" ]),
+            new(6, "Vielfraß", ["8 Rationen Fleisch (ungenießbar)", "Fell (besser)" ]),
+            new(5, "Baumschleimer", ["6 Rationen Fleisch (ungenießbar)", "Fell (wertlos)" ]),
+            new(20, "Gebirgsbock", ["60 Rationen Fleisch (zäh)", "Fell (einfach)", "Horn (Trophäe)" ]),
+            new(2, "Felsrobbe", ["bis 45 Rationen Fleisch", "Talg (Fett", "Öl", "5 S)", "Tran (1 D)", "Haut (Fell, besser, von Jungtieren teuer)" ]),
+            new(7, "Maraskanisches Stachelschwein", ["1 Ration Fleisch", "2W20+30 Stacheln (FF-Probe, um sie inklusive Giftdrüse aus dem Tier zu ziehen)" ]),
+            new(7, "Klippechse", ["10 Rationen Fleisch", "Haut (Leder, teuer)", "Eier (diverse alchemistische Anwendungen)" ]),
+            new(5, "Schreckkatze",  ["12 Rationen Fleisch (nur für Orks und Goblins genießbar)", "Fell wertlos"])
+        ];
 
         #endregion hard coded data
 
@@ -167,7 +167,7 @@ namespace Metatalente.Core
             {
                 skill = "Sich Verstecken";
             }
-            SetSkill(new string[] { "Wildnisleben", "Tierkunde", "Fährtensuchen", skill, UsedWeapon.UsedSkill });
+            SetSkill(["Wildnisleben", "Tierkunde", "Fährtensuchen", skill, UsedWeapon.UsedSkill]);
             if (core.character != null)
             {
                 if (core.character.Sonderfertigkeiten.Contains("Scharfschütze"))
@@ -240,8 +240,8 @@ namespace Metatalente.Core
             else
             {
                 int huntedAnimals = 0;
-                int[] quantityTotal = Array.Empty<int>();
-                string[] quantityStrings = Array.Empty<string>();
+                int[] quantityTotal = [];
+                string[] quantityStrings = [];
                 for (int i = 0; i < intervall; i++)
                 {
                     (int pointsResult, string[] resultStrings) rolldata = GetRollData(mod, i, intervall > 1);

@@ -1,14 +1,8 @@
 ﻿namespace Metatalente.Core
 {
-    public readonly struct Landscape
+    public readonly struct Landscape(string name, string? terrain = null)
     {
-        public string Name { get; }
-        public string? Terrain { get; }
-
-        public Landscape(string name, string? terrain = null)
-        {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Terrain = terrain;
-        }
+        public string Name { get; } = name ?? throw new ArgumentNullException(nameof(name));
+        public string? Terrain { get; } = terrain;
     }
 }

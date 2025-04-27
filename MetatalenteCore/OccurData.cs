@@ -1,16 +1,9 @@
 ﻿namespace Metatalente.Core
 {
-    public readonly struct OccurData
+    public readonly struct OccurData(Occur occur, Landscape landscape)
     {
-        public int? Mod { get; }
-        public string Occur { get; }
-        public string Landscape { get; }
-
-        public OccurData(Occur occur, Landscape landscape)
-        {
-            Mod = occur == 0 ? null : (int)occur;
-            Occur = Core.OccurToString((int)occur);
-            Landscape = landscape.Name;
-        }
+        public int? Mod { get; } = occur == 0 ? null : (int)occur;
+        public string Occur { get; } = Core.OccurToString((int)occur);
+        public string Landscape { get; } = landscape.Name;
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Metatalente.Core
 {
-    public struct Weapon
+    public readonly struct Weapon
     {
         public int MaxRange { get; }
         public string Name { get; }

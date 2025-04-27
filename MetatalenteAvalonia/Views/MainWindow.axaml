@@ -1,14 +1,17 @@
-﻿<Window
-    x:Class="Metatalente.WPF.MainWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<Window
+    x:Class="Metatalente.Avalonia.Views.MainWindow"
+    xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:custom="clr-namespace:NumericUpDownLib;assembly=NumericUpDownLib"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Metatalente.WPF"
+    xmlns:gb="using:GroupBox.Avalonia.Controls"
+    xmlns:local="clr-namespace:Metatalente.Avalonia.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Metatalente.Avalonia.ViewModels"
     Title="Metatalente"
     Width="825"
     Height="450"
+    d:DesignWidth="1200"
+    x:DataType="vm:MainWindowViewModel"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
@@ -17,33 +20,22 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
             <MenuItem Header="Charakter laden">
-                <MenuItem
-                    Name="MenuItemCharacterLoadFromTool"
-                    Click="MenuItemCharacterLoadFromTool_Click"
-                    Header="... aus Heldentool" />
-                <MenuItem
-                    Name="MenuItemCharacterLoadFromFile"
-                    Click="MenuItemCharacterLoadFromFile_Click"
-                    Header="... aus Datei" />
+                <MenuItem Name="MenuItemCharacterLoadFromTool" Header="... aus Heldentool" />
+                <MenuItem Name="MenuItemCharacterLoadFromFile" Header="... aus Datei" />
             </MenuItem>
-            <MenuItem
-                Name="MenuItemAbout"
-                Click="MenuItemAbout_Click"
-                Header="Über" />
+            <MenuItem Name="MenuItemAbout" Header="Über" />
             <MenuItem
                 Name="MenuItemUpdate"
-                Click="MenuItemUpdate_Click"
                 Header="Update Verfügbar"
-                Visibility="Hidden" />
+                IsVisible="False" />
         </Menu>
-
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="143" />
+                <ColumnDefinition Width="235" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
@@ -52,48 +44,36 @@
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
                 <Label Margin="10,10,0,10" Content="MU" />
-                <custom:NumericUpDown
+                <NumericUpDown
                     Name="InputMU"
                     Margin="10"
                     Cursor="Arrow"
-                    ForceCursor="True"
-                    IsReadOnly="False"
-                    MinValue="1"
-                    StepSize="1"
-                    ValueChanged="InputMU_ValueChanged"
+                    Increment="1"
+                    Minimum="0"
                     Value="8" />
                 <Label Margin="20,10,0,10" Content="IN" />
-                <custom:NumericUpDown
+                <NumericUpDown
                     Name="InputIN"
                     Margin="10"
                     Cursor="Arrow"
-                    ForceCursor="True"
-                    IsReadOnly="False"
-                    MinValue="1"
-                    StepSize="1"
-                    ValueChanged="InputIN_ValueChanged"
+                    Increment="1"
+                    Minimum="0"
                     Value="8" />
                 <Label Margin="20,10,0,10" Content="GE" />
-                <custom:NumericUpDown
+                <NumericUpDown
                     Name="InputGE"
                     Margin="10"
                     Cursor="Arrow"
-                    ForceCursor="True"
-                    IsReadOnly="False"
-                    MinValue="1"
-                    StepSize="1"
-                    ValueChanged="InputGE_ValueChanged"
+                    Increment="1"
+                    Minimum="0"
                     Value="8" />
                 <Label Margin="20,10,0,10" Content="FF" />
-                <custom:NumericUpDown
+                <NumericUpDown
                     Name="InputFF"
                     Margin="10"
                     Cursor="Arrow"
-                    ForceCursor="True"
-                    IsReadOnly="False"
-                    MinValue="1"
-                    StepSize="1"
-                    ValueChanged="InputFF_ValueChanged"
+                    Increment="1"
+                    Minimum="0"
                     Value="8" />
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="0">
@@ -101,121 +81,101 @@
                     <Grid x:Name="GridSkillWildnisleben" Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="110" />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Wildnisleben" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputSkillWildnisleben"
                             Grid.Column="1"
                             Cursor="Arrow"
-                            ForceCursor="True"
-                            IsReadOnly="False"
-                            MinValue="0"
-                            StepSize="1"
-                            ValueChanged="InputSkillWildnisleben_ValueChanged" />
+                            Increment="1"
+                            Minimum="0" />
                     </Grid>
                     <Grid x:Name="GridSkillSinnenschaerfe" Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="110" />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Sinnenschärfe" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputSkillSinnenschaerfe"
                             Grid.Column="1"
                             Cursor="Arrow"
-                            ForceCursor="True"
-                            IsReadOnly="False"
-                            MinValue="0"
-                            StepSize="1"
-                            ValueChanged="InputSkillSinnenschaerfe_ValueChanged" />
+                            Increment="1"
+                            Minimum="0" />
                     </Grid>
                     <Grid x:Name="GridSkillPflanzenkunde" Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="110" />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Pflanzenkunde" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputSkillPflanzenkunde"
                             Grid.Column="1"
                             Cursor="Arrow"
-                            ForceCursor="True"
-                            IsReadOnly="False"
-                            MinValue="0"
-                            StepSize="1"
-                            ValueChanged="InputSkillPflanzenkunde_ValueChanged" />
+                            Increment="1"
+                            Minimum="0" />
                     </Grid>
                     <Grid x:Name="GridSkillTierkunde" Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="110" />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Tierkunde" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputSkillTierkunde"
                             Grid.Column="1"
                             Cursor="Arrow"
-                            ForceCursor="True"
-                            IsReadOnly="False"
-                            MinValue="0"
-                            StepSize="1"
-                            ValueChanged="InputSkillTierkunde_ValueChanged" />
+                            Increment="1"
+                            Minimum="0" />
                     </Grid>
                     <Grid x:Name="GridSkillFaehrtensuchen" Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="110" />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Fährtensuchen" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputSkillFaehrtensuchen"
                             Grid.Column="1"
                             Cursor="Arrow"
-                            ForceCursor="True"
-                            IsReadOnly="False"
-                            MinValue="0"
-                            StepSize="1"
-                            ValueChanged="InputSkillFaehrtensuchen_ValueChanged" />
+                            Increment="1"
+                            Minimum="0" />
                     </Grid>
                     <Grid x:Name="GridSkillSchleichen" Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="110" />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Schleichen" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputSkillSchleichen"
                             Grid.Column="1"
                             Cursor="Arrow"
-                            ForceCursor="True"
-                            IsReadOnly="False"
-                            MinValue="0"
-                            StepSize="1"
-                            ValueChanged="InputSkillSchleichen_ValueChanged" />
+                            Increment="1"
+                            Minimum="0" />
                     </Grid>
                     <Grid x:Name="GridSkillSichVerstecken" Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="110" />
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Sich Verstecken" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputSkillSichVerstecken"
                             Grid.Column="1"
                             Cursor="Arrow"
-                            ForceCursor="True"
-                            IsReadOnly="False"
-                            MinValue="0"
-                            StepSize="1"
-                            ValueChanged="InputSkillSichVerstecken_ValueChanged" />
+                            Increment="1"
+                            Minimum="0" />
                     </Grid>
                 </StackPanel>
-                <GroupBox
+                <gb:GroupBox
                     Name="GroupboxChracterKnownTerrains"
-                    Margin="5"
+                    Margin="5,130,0,0"
                     Header="Geländekunden"
-                    IsEnabled="False">
+                    IsEnabled="False"
+                    Theme="{StaticResource GroupBoxClassic}">
                     <ItemsControl Name="KnownTerrainsPanel">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -228,7 +188,7 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </GroupBox>
+                </gb:GroupBox>
             </StackPanel>
             <Grid Grid.Row="1" Grid.Column="1">
                 <Grid.ColumnDefinitions>
@@ -251,9 +211,7 @@
                     Name="DropdownMonth"
                     Grid.Row="0"
                     Grid.Column="1"
-                    Margin="10"
-                    IsReadOnly="True"
-                    SelectionChanged="DropdownMonth_SelectionChanged" />
+                    Margin="10" />
                 <Label
                     Grid.Row="1"
                     Grid.Column="0"
@@ -263,9 +221,7 @@
                     Name="DropdownRegion"
                     Grid.Row="1"
                     Grid.Column="1"
-                    Margin="10"
-                    IsReadOnly="True"
-                    SelectionChanged="DropdownRegion_SelectionChanged" />
+                    Margin="10" />
                 <Label
                     Grid.Row="2"
                     Grid.Column="0"
@@ -275,22 +231,19 @@
                     Name="DropdownLandscape"
                     Grid.Row="2"
                     Grid.Column="1"
-                    Margin="10"
-                    IsReadOnly="True"
-                    SelectionChanged="DropdownLandscape_SelectionChanged" />
+                    Margin="10" />
                 <CheckBox
                     x:Name="CbIsKnownTerrain"
                     Grid.Row="3"
                     Grid.Column="1"
                     Margin="10"
-                    Checked="CbIsKnownTerrain_CheckedChanged"
-                    Content="Geländekunde vorhanden"
-                    Unchecked="CbIsKnownTerrain_CheckedChanged" />
-                <GroupBox
+                    Content="Geländekunde vorhanden" />
+                <gb:GroupBox
                     Grid.Row="4"
                     Grid.ColumnSpan="2"
                     Margin="10"
-                    Header="Beschreibung">
+                    Header="Beschreibung"
+                    Theme="{StaticResource GroupBoxClassic}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
@@ -332,14 +285,13 @@
                             Grid.Column="1"
                             Margin="10" />
                     </Grid>
-                </GroupBox>
+                </gb:GroupBox>
             </Grid>
             <TabControl
                 Name="TabControl"
                 Grid.Row="0"
                 Grid.RowSpan="2"
-                Grid.Column="2"
-                SelectionChanged="TabControl_SelectionChanged">
+                Grid.Column="2">
                 <TabItem Name="TabForaging" Header="Nahrung suchen">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -356,16 +308,15 @@
                             Grid.Column="0"
                             Margin="10"
                             Content="Dauer" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputDurationForaging"
                             Grid.Row="0"
                             Grid.Column="1"
                             Margin="10"
-                            Cursor="Arrow"
-                            IsReadOnly="False"
-                            MinValue="60"
-                            StepSize="1"
-                            ValueChanged="InputDurationForaging_ValueChanged" />
+                            VerticalAlignment="Top"
+                            Increment="1"
+                            Minimum="60"
+                            Value="60" />
                         <Button
                             Name="BtnRollForaging"
                             Grid.Row="0"
@@ -375,7 +326,6 @@
                             Margin="10"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
-                            Click="BtnRollForaging_Click"
                             Content="Würfeln" />
                         <local:ResultControl
                             x:Name="ResultControlForaging"
@@ -402,16 +352,15 @@
                             Grid.Column="0"
                             Margin="10"
                             Content="Dauer" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputDurationPlantSeeking"
                             Grid.Row="0"
                             Grid.Column="1"
                             Margin="10"
                             Cursor="Arrow"
-                            IsReadOnly="False"
-                            MinValue="60"
-                            StepSize="1"
-                            ValueChanged="InputDurationPlantSeeking_ValueChanged" />
+                            Increment="1"
+                            Minimum="60"
+                            Value="60" />
                         <Button
                             Name="BtnRollPlantseeking"
                             Grid.Row="0"
@@ -421,7 +370,6 @@
                             Margin="10"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
-                            Click="BtnRollPlantseeking_Click"
                             Content="Würfeln" />
                         <Label
                             Grid.Row="1"
@@ -434,16 +382,12 @@
                             Grid.Column="1"
                             Margin="10"
                             VerticalAlignment="Center"
-                            Checked="CbCoincidencePlantSeeking_CheckedChanged"
-                            Content="Zufall"
-                            Unchecked="CbCoincidencePlantSeeking_CheckedChanged" />
+                            Content="Zufall" />
                         <ComboBox
                             Name="DropdownPlant"
                             Grid.Row="1"
                             Grid.Column="2"
-                            Margin="10"
-                            IsReadOnly="True"
-                            SelectionChanged="DropdownPlant_SelectionChanged" />
+                            Margin="10" />
                         <Grid
                             Grid.Row="3"
                             Grid.Column="1"
@@ -517,17 +461,14 @@
                             Grid.Column="0"
                             Margin="10"
                             Content="Dauer" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputDurationHunting"
                             Grid.Row="0"
                             Grid.Column="1"
                             Margin="10"
                             Cursor="Arrow"
-                            ForceCursor="True"
-                            IsReadOnly="False"
-                            MinValue="60"
-                            StepSize="1"
-                            ValueChanged="InputDurationHunting_ValueChanged" />
+                            Increment="1"
+                            Minimum="60" />
                         <Button
                             Name="BtnRollHunting"
                             Grid.Row="0"
@@ -537,36 +478,29 @@
                             Margin="10"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
-                            Click="BtnRollHunting_Click"
                             Content="Würfeln" />
                         <RadioButton
                             Name="RadioHuntingSkillPirschjagd"
                             Grid.Row="1"
                             Grid.Column="0"
-                            Checked="RadioHuntingSkillPirschjagd_Checked"
                             Content="Pirschjagd" />
                         <RadioButton
                             Name="RadioHuntingSkillAnsitzjagd"
                             Grid.Row="2"
                             Grid.Column="0"
-                            Checked="RadioHuntingSkillAnsitzjagd_Checked"
                             Content="Ansitzjagd" />
                         <CheckBox
                             Name="CbIsScharfschuetze"
                             Grid.Row="1"
                             Grid.Column="2"
                             Margin="10,0,0,0"
-                            Checked="CbIsScharfschuetze_CheckedChanged"
-                            Content="Scharfschütze"
-                            Unchecked="CbIsScharfschuetze_CheckedChanged" />
+                            Content="Scharfschütze" />
                         <CheckBox
                             Name="CbIsMeisterschuetze"
                             Grid.Row="2"
                             Grid.Column="2"
                             Margin="10,0,0,0"
-                            Checked="CbIsMeisterschuetze_CheckedChanged"
-                            Content="Meisterschütze"
-                            Unchecked="CbIsMeisterschuetze_CheckedChanged" />
+                            Content="Meisterschütze" />
                         <Label
                             Grid.Row="3"
                             Grid.Column="0"
@@ -578,39 +512,30 @@
                             Grid.Column="1"
                             Margin="10"
                             VerticalAlignment="Center"
-                            Checked="CbCoincidenceHunting_CheckedChanged"
-                            Content="Zufall"
-                            Unchecked="CbCoincidenceHunting_CheckedChanged" />
+                            Content="Zufall" />
                         <ComboBox
                             Name="DropdownAnimal"
                             Grid.Row="3"
                             Grid.Column="2"
-                            Margin="10"
-                            IsReadOnly="True"
-                            SelectionChanged="DropdownAnimal_SelectionChanged" />
+                            Margin="10" />
                         <Label
                             Grid.Row="4"
                             Grid.Column="0"
                             Margin="10"
                             Content="Waffe" />
-                        <custom:NumericUpDown
+                        <NumericUpDown
                             Name="InputSkillWeapon"
                             Grid.Row="4"
                             Grid.Column="1"
                             Margin="10"
                             Cursor="Arrow"
-                            ForceCursor="True"
-                            IsReadOnly="False"
-                            MinValue="0"
-                            StepSize="1"
-                            ValueChanged="InputSkillWeapon_ValueChanged" />
+                            Increment="1"
+                            Minimum="0" />
                         <ComboBox
                             Name="DropdownWeapon"
                             Grid.Row="4"
                             Grid.Column="2"
-                            Margin="10"
-                            IsReadOnly="True"
-                            SelectionChanged="DropdownWeapon_SelectionChanged" />
+                            Margin="10" />
                         <Grid
                             Grid.Row="5"
                             Grid.Column="1"
