@@ -1,9 +1,9 @@
-﻿namespace Metatalente.Core
+namespace DSAMetatalente.Core
 {
-    public readonly struct Animal
+    public readonly struct Animal(int difficulty, string name, string[] loot)
     {
-        public int Difficulty { get; }
-        public string Name { get; }
+        public int Difficulty { get; } = difficulty;
+        public string Name { get; } = name ?? throw new ArgumentNullException(nameof(name));
         public string LootDisplayText
         {
             get
@@ -16,13 +16,6 @@
                 return text.TrimEnd(',');
             }
         }
-        public string[] Loot { get; }
-
-        public Animal(int difficulty, string name, string[] loot)
-        {
-            Difficulty = difficulty;
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Loot = loot ?? throw new ArgumentNullException(nameof(loot));
-        }
+        public string[] Loot { get; } = loot ?? throw new ArgumentNullException(nameof(loot));
     }
 }

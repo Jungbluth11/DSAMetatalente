@@ -1,12 +1,11 @@
-﻿namespace Metatalente.Core
+namespace DSAMetatalente.Core;
+
+public enum Occur
 {
-    public enum Occur
-    {
-        None = 0,
-        VeryCommon = 1,
-        Common = 2,
-        Modest = 4,
-        Rare = 8,
-        VeryRare = 16,
-    }
+    None = 0,
+    VeryCommon = 1,
+    Common = 2,
+    Modest = 4,
+    Rare = 8,
+    VeryRare = 16,
 }
