@@ -1,3 +1,5 @@
+using Windows.Foundation;
+
 namespace DSAMetatalente.Controls;
 
 public sealed partial class SkillControl : UserControl
@@ -8,7 +10,6 @@ public sealed partial class SkillControl : UserControl
         set => SetValue(TextProperty, value);
     }
 
-
     public int Value
     {
         get => (int)GetValue(ValueProperty);
@@ -17,23 +18,26 @@ public sealed partial class SkillControl : UserControl
 
     public static readonly DependencyProperty TextProperty =
         DependencyProperty.Register(nameof(Text), typeof(string), typeof(SkillControl),
-            new(default(string),
-                (d, e) =>
-                {
-                    ((d as UserControl)!.Content as Grid)!.Children.OfType<TextBlock>().FirstOrDefault()!.Text =
-                        e.NewValue.ToString();
-                }));
+            new(default(string), OnTextChanged));
 
     public static readonly DependencyProperty ValueProperty =
         DependencyProperty.Register(nameof(Value), typeof(int), typeof(SkillControl), new(0));
 
+    public event TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>? ValueChanged;
 
     public SkillControl()
     {
         InitializeComponent();
     }
 
+    private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((d as UserControl)!.Content as Grid)!.Children.OfType<TextBlock>().FirstOrDefault()!.Text =
+            e.NewValue.ToString();
+    }
+
     private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
     {
+        ValueChanged!.Invoke(sender, args);
     }
 }

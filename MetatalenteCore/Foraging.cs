@@ -1,10 +1,10 @@
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
 public class Foraging : MetatalentBase
 {
-    public Foraging(Core core)
+    public Foraging()
     {
-        this.core = core;
+        core = Core.GetInstance();
     }
 
     public override void SetSkill()
@@ -14,7 +14,6 @@ public class Foraging : MetatalentBase
 
     public override void Roll()
     {
-        int pointsLeft;
         int amount = 0;
 
         if (core.CurrentRegion.ForagingMod is null)
@@ -31,14 +30,13 @@ public class Foraging : MetatalentBase
         }
 
         mod -= durationMod;
-        (int pointsReselut, string stringResult) rolldata = Roll(core.MU, core.IN, core.GE, mod);
-        pointsLeft = rolldata.pointsReselut;
+        (int pointsLeft, string stringResult) = Roll(core.Mu, core.In, core.Ge, mod);
 
         if (pointsLeft > 0)
         {
             amount = 1 + (pointsLeft / 3);
         }
 
-        LastResult = new Result(pointsLeft.ToString(), rolldata.stringResult, amount.ToString() + " Rationen");
+        LastResult = new(pointsLeft.ToString(), stringResult, amount.ToString() + " Rationen");
     }
 }

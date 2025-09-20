@@ -1,4 +1,4 @@
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
 public readonly struct OccurData(Occur occur, Landscape landscape)
 {

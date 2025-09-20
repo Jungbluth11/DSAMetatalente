@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
 
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
 public class PlantSeeking : MetatalentBase
 {
-    private readonly Random random = new();
+    private readonly Random _random = new();
     public bool Coincidence { get; set; } = false;
     public Plant CurrentPlant { get; set; } = Plants[0];
 
@@ -118,9 +118,9 @@ public class PlantSeeking : MetatalentBase
 
     #endregion hard coded data
 
-    public PlantSeeking(Core core)
+    public PlantSeeking()
     {
-        this.core = core;
+        core = Core.GetInstance();
     }
 
     public override void SetSkill()
@@ -144,11 +144,11 @@ public class PlantSeeking : MetatalentBase
 
         if (Coincidence)
         {
-            rolldata = Roll(core.MU, core.IN, core.GE, mod, skillpoints);
+            rolldata = Roll(core.Mu, core.In, core.Ge, mod, skillpoints);
             pointsLeft = rolldata.pointsResult;
             bool canFind = true;
-            List<Plant> PlantsLootTable = [];
-            List<ResultData> Results = [];
+            List<Plant> plantsLootTable = [];
+            List<ResultData> results = [];
             List<(string name, int difficulty)> plantDifficulties = [];
             List<Plant> plantsToRemove = [];
 
@@ -157,7 +157,7 @@ public class PlantSeeking : MetatalentBase
                 int foundingDifficulty = GetFoundingDifficulty(plant);
                 if (foundingDifficulty <= pointsLeft / 2 && plant.Loot[0] != "Keine Angabe im ZBA")
                 {
-                    PlantsLootTable.AddRange(GenerateLootTableEntry(plant));
+                    plantsLootTable.AddRange(GenerateLootTableEntry(plant));
                     plantDifficulties.Add((plant.Name, foundingDifficulty));
                 }
                 else
@@ -170,12 +170,12 @@ public class PlantSeeking : MetatalentBase
             {
                 foreach (Plant plant in plantsToRemove)
                 {
-                    PlantsLootTable.RemoveAll(p => p.Name == plant.Name);
+                    plantsLootTable.RemoveAll(p => p.Name == plant.Name);
                 }
                 plantsToRemove.Clear();
             }
 
-            if (PlantsLootTable.Count == 0)
+            if (plantsLootTable.Count == 0)
             {
                 canFind = false;
             }
@@ -184,26 +184,26 @@ public class PlantSeeking : MetatalentBase
             {
                 if (plantDifficulties.Count > 0 && pointsLeft / 2 >= (from Tuple in plantDifficulties select Tuple.difficulty).ToArray().Min())
                 {
-                    int index = PlantsLootTable.Count == 1 ? 0 : random.Next(PlantsLootTable.Count);
-                    (int[] quantityData, string[] quantityStrings) result = GenerateLootQuantity(PlantsLootTable[index].Loot);
+                    int index = plantsLootTable.Count == 1 ? 0 : _random.Next(plantsLootTable.Count);
+                    (int[] quantityData, string[] quantityStrings) result = GenerateLootQuantity(plantsLootTable[index].Loot);
 
                     try
                     {
-                        Results.Single(r => r.Name == PlantsLootTable[index].Name).IncreaseData(result.quantityData);
+                        results.Single(r => r.Name == plantsLootTable[index].Name).IncreaseData(result.quantityData);
                     }
                     catch
                     {
                         ResultData resultData = new()
                         {
-                            Name = PlantsLootTable[index].Name,
+                            Name = plantsLootTable[index].Name,
                             Quantity = result
                         };
-                        Results.Add(resultData);
+                        results.Add(resultData);
                     }
 
-                    pointsLeft -= plantDifficulties.Single(p => p.name == PlantsLootTable[index].Name).difficulty;
+                    pointsLeft -= plantDifficulties.Single(p => p.name == plantsLootTable[index].Name).difficulty;
 
-                    foreach (Plant plant in PlantsLootTable)
+                    foreach (Plant plant in plantsLootTable)
                     {
                         if (GetFoundingDifficulty(plant) > pointsLeft / 2 && !plantsToRemove.Contains(plant))
                         {
@@ -213,7 +213,7 @@ public class PlantSeeking : MetatalentBase
 
                     foreach (Plant plant in plantsToRemove)
                     {
-                        PlantsLootTable.RemoveAll(p => p.Name == plant.Name);
+                        plantsLootTable.RemoveAll(p => p.Name == plant.Name);
                         plantDifficulties.Remove(plantDifficulties.SingleOrDefault(t => t.name == plant.Name));
                     }
                     plantsToRemove.Clear();
@@ -222,13 +222,13 @@ public class PlantSeeking : MetatalentBase
                 {
                     canFind = false;
 
-                    for (int i = 0; i < Results.Count; i++)
+                    for (int i = 0; i < results.Count; i++)
                     {
-                        textResult += Results[i].Name + ":\n";
+                        textResult += results[i].Name + ":\n";
 
-                        for (int n = 0; n < Results[i].Quantity.quantityData.Length; n++)
+                        for (int n = 0; n < results[i].Quantity.quantityData.Length; n++)
                         {
-                            textResult += Results[i].Quantity.quantityData[n] + Results[i].Quantity.quantityStrings[n].TrimEnd(',') + "\n";
+                            textResult += results[i].Quantity.quantityData[n] + results[i].Quantity.quantityStrings[n].TrimEnd(',') + "\n";
                         }
                     }
                 }
@@ -239,7 +239,7 @@ public class PlantSeeking : MetatalentBase
             int[] quantityTotal = [];
             string[] quantityStrings = [];
             mod = GetFoundingDifficulty(CurrentPlant);
-            rolldata = Roll(core.MU, core.IN, core.GE, mod, skillpoints);
+            rolldata = Roll(core.Mu, core.In, core.Ge, mod, skillpoints);
             pointsLeft = rolldata.pointsResult;
 
             if (pointsLeft >= 0)
@@ -273,7 +273,7 @@ public class PlantSeeking : MetatalentBase
                 }
             }
         }
-        LastResult = new Result(rolldata.pointsResult.ToString(), rolldata.stringResult, textResult);
+        LastResult = new(rolldata.pointsResult.ToString(), rolldata.stringResult, textResult);
     }
 
     public Plant GetPlantByName(string plantName)
@@ -293,9 +293,9 @@ public class PlantSeeking : MetatalentBase
 
     private (int[] quantityData, string[] quantityStrings) GenerateLootQuantity(string[] loot)
     {
-        Regex variableQuantityRegex = new("((\\s|[0-9]+)?W[0-9]+(\\+[0-9]+)?)");
+        Regex variableQuantityRegex = new(@"((\s|[0-9]+)?W[0-9]+(\+[0-9]+)?)");
         Regex fixedQuantityRegex = new("\\s?[0-9][0-9]?");
-        Regex unitRegex = new("[0-9]+(\\s\\w{3,})(?!\\s[0-9])");
+        Regex unitRegex = new(@"[0-9]+(\s\w{3,})(?!\s[0-9])");
         List<int> quantityData = [];
         List<string> quantityStrings = [];
 

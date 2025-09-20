@@ -1,4 +1,4 @@
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
 public struct ResultData
 {

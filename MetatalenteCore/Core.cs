@@ -1,31 +1,241 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using DSAUtils.HeldentoolInterop;
 using DSAUtils.Settings.Aventurien;
 
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
-public class Core
+public class Core : INotifyPropertyChanged
 {
-    internal Charakter? character;
+    internal Charakter? Character { get; private set; }
     private readonly List<string> _knownTerrains = [];
-    public int MU { get; set; } = 8;
-    public int IN { get; set; } = 8;
-    public int GE { get; set; } = 8;
-    public int FF { get; set; } = 8;
-    public int SkillWildnisleben { get; set; }
-    public int SkillSinnenschaerfe { get; set; }
-    public int SkillPflanzenkunde { get; set; }
-    public int SkillTierkunde { get; set; }
-    public int SkillFaehrtensuchen { get; set; }
-    public int SkillSchleichen { get; set; }
-    public int SkillSichVerstecken { get; set; }
-    public int SkillWeapon { get; set; }
+    private int _skillWildnisleben;
+    private int _skillSinnenschaerfe;
+    private int _skillPflanzenkunde;
+    private int _skillTierkunde;
+    private int _skillFaehrtensuchen;
+    private int _skillSchleichen;
+    private int _skillSichVerstecken;
+    private int _skillWeapon;
+    private Region _currentRegion = Regions[0];
+    private Landscape _currentLandscape = Landscapes[0];
+    private int _mu = 8;
+    private int _in = 8;
+    private int _ge = 8;
+    private int _ff = 8;
+
+    public int Mu
+    {
+        get => _mu;
+        set
+        {
+            if (value == _mu)
+            {
+                return;
+            }
+
+            _mu = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int In
+    {
+        get => _in;
+        set
+        {
+            if (value == _in)
+            {
+                return;
+            }
+
+            _in = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int Ge
+    {
+        get => _ge;
+        set
+        {
+            if (value == _ge)
+            {
+                return;
+            }
+
+            _ge = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int Ff
+    {
+        get => _ff;
+        set
+        {
+            if (value == _ff)
+            {
+                return;
+            }
+
+            _ff = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillWildnisleben
+    {
+        get => _skillWildnisleben;
+        set
+        {
+            if (value == _skillWildnisleben)
+            {
+                return;
+            }
+
+            _skillWildnisleben = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillSinnenschaerfe
+    {
+        get => _skillSinnenschaerfe;
+        set
+        {
+            if (value == _skillSinnenschaerfe)
+            {
+                return;
+            }
+
+            _skillSinnenschaerfe = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillPflanzenkunde
+    {
+        get => _skillPflanzenkunde;
+        set
+        {
+            if (value == _skillPflanzenkunde)
+            {
+                return;
+            }
+
+            _skillPflanzenkunde = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillTierkunde
+    {
+        get => _skillTierkunde;
+        set
+        {
+            if (value == _skillTierkunde)
+            {
+                return;
+            }
+
+            _skillTierkunde = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillFaehrtensuchen
+    {
+        get => _skillFaehrtensuchen;
+        set
+        {
+            if (value == _skillFaehrtensuchen)
+            {
+                return;
+            }
+
+            _skillFaehrtensuchen = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillSchleichen
+    {
+        get => _skillSchleichen;
+        set
+        {
+            if (value == _skillSchleichen)
+            {
+                return;
+            }
+
+            _skillSchleichen = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillSichVerstecken
+    {
+        get => _skillSichVerstecken;
+        set
+        {
+            if (value == _skillSichVerstecken)
+            {
+                return;
+            }
+
+            _skillSichVerstecken = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillWeapon
+    {
+        get => _skillWeapon;
+        set
+        {
+            if (value == _skillWeapon)
+            {
+                return;
+            }
+
+            _skillWeapon = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string[] Terrains => Sonderfertigkeiten.GetByGroup(Sonderfertigkeitengruppe.Gelaendekunde);
     public string[] KnownTerrains => [.. _knownTerrains];
     public string CurrentMonth { get; set; } = Months[0];
     public bool IsHeldenToolInstalled => HeldentoolInterop.IsInstalled();
     public bool IsKnownTerrain { get; set; }
-    public Region CurrentRegion { get; set; } = Regions[0];
-    public Landscape CurrentLandscape { get; set; } = Landscapes[0];
+
+    public Region CurrentRegion
+    {
+        get => _currentRegion;
+        set
+        {
+            if (value.Equals(_currentRegion)) return;
+
+            _currentRegion = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public Landscape CurrentLandscape
+    {
+        get => _currentLandscape;
+        set
+        {
+            if (value.Equals(_currentLandscape)) return;
+
+            _currentLandscape = value;
+            OnPropertyChanged();
+        }
+    }
+
+
+    private static Core? _instance;
 
     #region hard coded data
 
@@ -98,14 +308,27 @@ public class Core
 
     #endregion hard coded data
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private Core()
+    {
+
+    }
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new(propertyName));
+    }
+
+    public static Core GetInstance()
+    {
+        _instance ??= new();
+        return _instance;
+    }
+
     public Charakter[] GetCharactersFromTool()
     {
-        if (IsHeldenToolInstalled)
-        {
-            return HeldentoolInterop.Load();
-        }
-
-        throw new Exception("\"Heldentool\" is not installed.");
+        return IsHeldenToolInstalled ? HeldentoolInterop.Load() : throw new("\"Heldentool\" is not installed.");
     }
 
     public void LoadCharacterFromFile(string filename)
@@ -115,7 +338,7 @@ public class Core
 
     public void LoadCharacter(Charakter character)
     {
-        this.character = character;
+        Character = character;
         _knownTerrains.Clear();
         IsKnownTerrain = false;
 
@@ -124,18 +347,16 @@ public class Core
             switch (ability.Name)
             {
                 case "Mut":
-                    MU = ability.Wert;
+                    Mu = ability.Wert;
                     break;
                 case "Intuition":
-                    IN = ability.Wert;
+                    In = ability.Wert;
                     break;
                 case "Fingerfertigkeit":
-                    FF = ability.Wert;
+                    Ff = ability.Wert;
                     break;
                 case "Gewandtheit":
-                    GE = ability.Wert;
-                    break;
-                default:
+                    Ge = ability.Wert;
                     break;
             }
         }
@@ -165,8 +386,6 @@ public class Core
                 case "Sich Verstecken":
                     SkillSichVerstecken = ability.Wert;
                     break;
-                default:
-                    break;
             }
         }
 
@@ -182,6 +401,8 @@ public class Core
         {
             IsKnownTerrain = _knownTerrains.Contains(CurrentLandscape.Terrain);
         }
+
+        OnPropertyChanged();
     }
 
     public void AddKnownTerrain(string terrain)

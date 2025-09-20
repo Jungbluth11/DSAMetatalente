@@ -1,15 +1,15 @@
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
-public readonly struct Region(Occur foraging, Occur wildlife, string name, string[] landscapes, string[] animals, string[] plants)
+public readonly record struct Region(Occur Foraging, Occur Wildlife, string Name, string[] Landscapes, string[] Animals, string[] Plants)
 {
-    public int? ForagingMod { get; } = foraging == 0 ? null : (int)foraging;
-    public int? WildlifeMod { get; } = wildlife == 0 ? null : (int)wildlife;
-    public string ForagingString { get; } = Core.OccurToString((int)foraging);
-    public string WildlifeString { get; } = Core.OccurToString((int)wildlife);
-    public string Name { get; } = name ?? throw new ArgumentNullException(nameof(name));
-    public string[] Landscapes { get; } = landscapes ?? throw new ArgumentNullException(nameof(landscapes));
-    public string[] Animals { get; } = animals ?? throw new ArgumentNullException(nameof(animals));
-    public string[] Plants { get; } = plants ?? throw new ArgumentNullException(nameof(plants));
+    public int? ForagingMod { get; } = Foraging == 0 ? null : (int)Foraging;
+    public int? WildlifeMod { get; } = Wildlife == 0 ? null : (int)Wildlife;
+    public string ForagingString { get; } = Core.OccurToString((int)Foraging);
+    public string WildlifeString { get; } = Core.OccurToString((int)Wildlife);
+    public string Name { get; } = Name ?? throw new ArgumentNullException(nameof(Name));
+    public string[] Landscapes { get; } = Landscapes ?? throw new ArgumentNullException(nameof(Landscapes));
+    public string[] Animals { get; } = Animals ?? throw new ArgumentNullException(nameof(Animals));
+    public string[] Plants { get; } = Plants ?? throw new ArgumentNullException(nameof(Plants));
 
     public Plant[] GetPossiblePlants(string landscape, string month)
     {
@@ -26,14 +26,7 @@ public readonly struct Region(Occur foraging, Occur wildlife, string name, strin
         }
 
         List<Plant> plantsData = [];
-
-        foreach (Plant plant in plantsLandscape)
-        {
-            if (plant.Months.Contains(month))
-            {
-                plantsData.Add(plant);
-            }
-        }
+        plantsData.AddRange(plantsLandscape.Where(plant => plant.Months.Contains(month)));
 
         return [.. plantsData];
     }

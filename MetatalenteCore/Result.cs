@@ -1,8 +1,8 @@
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
-public readonly struct Result(string pointsLeft, string diceResult, string textResult)
+public readonly record struct Result(string PointsLeft, string DiceResult, string TextResult)
 {
-    public string PointsLeft { get; } = pointsLeft ?? throw new ArgumentNullException(nameof(pointsLeft));
-    public string DiceResult { get; } = diceResult ?? throw new ArgumentNullException(nameof(diceResult));
-    public string TextResult { get; } = textResult ?? throw new ArgumentNullException(nameof(textResult));
+    public string PointsLeft { get; } = PointsLeft ?? throw new ArgumentNullException(nameof(PointsLeft));
+    public string DiceResult { get; } = DiceResult ?? throw new ArgumentNullException(nameof(DiceResult));
+    public string TextResult { get; } = TextResult ?? throw new ArgumentNullException(nameof(TextResult));
 }

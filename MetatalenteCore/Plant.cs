@@ -1,6 +1,6 @@
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
-public readonly struct Plant
+public readonly record struct Plant
 {
     public int IdentificationMod { get; }
     public string Name { get; }
@@ -8,11 +8,7 @@ public readonly struct Plant
     {
         get
         {
-            string text = string.Empty;
-            foreach (string item in Loot)
-            {
-                text += item + ", ";
-            }
+            string text = Loot.Aggregate(string.Empty, (current, item) => current + (item + ", "));
             return text.TrimEnd(',');
         }
     }
@@ -26,24 +22,8 @@ public readonly struct Plant
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Loot = loot ?? throw new ArgumentNullException(nameof(loot));
         Months = months ?? throw new ArgumentNullException(nameof(months));
-
-        if (landscapes is null)
-        {
-            throw new ArgumentNullException(nameof(landscapes));
-        }
-
-        if (occur is null)
-        {
-            throw new ArgumentNullException(nameof(occur));
-        }
-
-        List<OccurData> occurData = [];
-
-        for (int i = 0; i < landscapes.Length; i++)
-        {
-            occurData.Add(new OccurData(occur[i], Core.GetLandscape(landscapes[i])));
-        }
-
-        OccurData = [.. occurData];
+        ArgumentNullException.ThrowIfNull(landscapes);
+        ArgumentNullException.ThrowIfNull(occur);
+        OccurData = [.. landscapes.Select((s, i) => new OccurData(occur[i], Core.GetLandscape(s)))];
     }
 }

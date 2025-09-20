@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using DSAUtils.HeldentoolInterop;
 
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
 public class Hunting : MetatalentBase
 {
@@ -13,14 +13,7 @@ public class Hunting : MetatalentBase
         set
         {
             _variant = value;
-            if (_variant == Variants.Pirschjagd)
-            {
-                MinDuration = 60;
-            }
-            else
-            {
-                MinDuration = 90;
-            }
+            MinDuration = _variant == Variants.Pirschjagd ? 60 : 90;
         }
     }
     public bool IsScharfschuetze { get; set; }
@@ -151,43 +144,35 @@ public class Hunting : MetatalentBase
 
     #endregion hard coded data
 
-    public Hunting(Core core)
+    public Hunting()
     {
-        this.core = core;
+        core = Core.GetInstance();
     }
 
     public override void SetSkill()
     {
-        string skill;
-
-        if (Variant == Variants.Pirschjagd)
-        {
-            skill = "Schleichen";
-        }
-        else
-        {
-            skill = "Sich Verstecken";
-        }
+        string skill = Variant == Variants.Pirschjagd ? "Schleichen" : "Sich Verstecken";
 
         SetSkill(["Wildnisleben", "Tierkunde", "Fährtensuchen", skill, UsedWeapon.UsedSkill]);
 
-        if (core.character != null)
+        if (core.Character == null)
         {
-            if (core.character.Sonderfertigkeiten.Contains("Scharfschütze"))
-            {
-                IsScharfschuetze = true;
-            }
+            return;
+        }
 
-            if (core.character.Sonderfertigkeiten.Contains("Meisterschütze"))
-            {
-                IsMeisterschuetze = true;
-            }
+        if (core.Character.Sonderfertigkeiten.Contains("Scharfschütze"))
+        {
+            IsScharfschuetze = true;
+        }
+
+        if (core.Character.Sonderfertigkeiten.Contains("Meisterschütze"))
+        {
+            IsMeisterschuetze = true;
         }
     }
 
     public override void Roll()
     {
-        int intervall;
         int mod = 0;
         int lowRangeMod = 0;
         string pointsLeft = string.Empty;
@@ -208,14 +193,12 @@ public class Hunting : MetatalentBase
             mod += CurrentAnimal.Difficulty + (int)core.CurrentRegion.WildlifeMod;
         }
 
-        if (UsedWeapon.MaxRange == 20)
+        lowRangeMod = UsedWeapon.MaxRange switch
         {
-            lowRangeMod = 7;
-        }
-        else if (UsedWeapon.MaxRange < 51)
-        {
-            lowRangeMod = 3;
-        }
+            20 => 7,
+            < 51 => 3,
+            _ => lowRangeMod
+        };
 
         mod += lowRangeMod;
 
@@ -233,7 +216,7 @@ public class Hunting : MetatalentBase
             mod = lowRangeMod;
         }
 
-        intervall = Duration / MinDuration;
+        int intervall = Duration / MinDuration;
 
         if (Coincidence)
         {
@@ -241,13 +224,13 @@ public class Hunting : MetatalentBase
 
             for (int i = 0; i < intervall; i++)
             {
-                (int pointsResult, string[] resultStrings) rolldata = GetRollData(mod, i, intervall > 1);
-                amount += rolldata.pointsResult;
-                pointsLeft += rolldata.resultStrings[0];
-                diceResult += rolldata.resultStrings[1];
+                (int pointsResult, string[] resultStrings) = GetRollData(mod, i, intervall > 1);
+                amount += pointsResult;
+                pointsLeft += resultStrings[0];
+                diceResult += resultStrings[1];
             }
 
-            textResult += amount.ToString() + " Rationen";
+            textResult += amount + " Rationen";
         }
         else
         {
@@ -256,29 +239,31 @@ public class Hunting : MetatalentBase
             string[] quantityStrings = [];
             for (int i = 0; i < intervall; i++)
             {
-                (int pointsResult, string[] resultStrings) rolldata = GetRollData(mod, i, intervall > 1);
-                pointsLeft += rolldata.resultStrings[0];
-                diceResult += rolldata.resultStrings[1];
+                (int pointsResult, string[] resultStrings) = GetRollData(mod, i, intervall > 1);
+                pointsLeft += resultStrings[0];
+                diceResult += resultStrings[1];
 
-                if (rolldata.pointsResult > 0)
+                if (pointsResult <= 0)
                 {
-                    huntedAnimals++;
-                    (int[] quantityData, string[] quantityStrings) result = GenerateLootQuantity(CurrentAnimal.Loot);
+                    continue;
+                }
 
-                    if (quantityTotal.Length == 0)
-                    {
-                        quantityTotal = new int[result.quantityData.Length];
-                        quantityStrings = result.quantityStrings;
-                    }
+                huntedAnimals++;
+                (int[] quantityData, string[] quantityStrings) result = GenerateLootQuantity(CurrentAnimal.Loot);
 
-                    for (int j = 0; j < quantityTotal.Length; j++)
-                    {
-                        quantityTotal[j] += result.quantityData[j];
-                    }
+                if (quantityTotal.Length == 0)
+                {
+                    quantityTotal = new int[result.quantityData.Length];
+                    quantityStrings = result.quantityStrings;
+                }
+
+                for (int j = 0; j < quantityTotal.Length; j++)
+                {
+                    quantityTotal[j] += result.quantityData[j];
                 }
             }
 
-            textResult = huntedAnimals.ToString() + (huntedAnimals > 1 ? " Tiere" : " Tier") + "\n\n";
+            textResult = huntedAnimals + (huntedAnimals > 1 ? " Tiere" : " Tier") + "\n\n";
 
             for (int i = 0; i < quantityTotal.Length; i++)
             {
@@ -286,7 +271,7 @@ public class Hunting : MetatalentBase
             }
         }
 
-        LastResult = new Result(pointsLeft, diceResult, textResult);
+        LastResult = new(pointsLeft, diceResult, textResult);
     }
 
     public Animal GetAnimalByName(string animalName)
@@ -301,26 +286,26 @@ public class Hunting : MetatalentBase
 
     public void LoadWeaponFromCharacter()
     {
-        if (core.character != null)
+        if (core.Character == null)
         {
-            try
-            {
-                XmlDocument xml = new();
-                xml.LoadXml(core.character.XML);
-                string number = xml.SelectSingleNode("//heldenausruestung[@name='jagtwaffe']").Attributes["nummer"].Value;
-#pragma warning disable CS8600
-                XmlNode weapon = xml.SelectSingleNode("//heldenausruestung[@name='fkwaffe" + number + "']");
-#pragma warning restore CS8600
-                Ability weaponAbility = core.character.Talente.Single(a => a.Name == weapon.Attributes["talent"].Value);
-                UsedWeapon = GetWeaponByName(weapon.Attributes["waffenname"].Value);
-                core.SkillWeapon = weaponAbility.Wert;
-                IsScharfschuetze = core.character.Sonderfertigkeiten.Contains("Scharfschütze (" + weaponAbility.Name + ")");
-                IsMeisterschuetze = core.character.Sonderfertigkeiten.Contains("Meisterschütze (" + weaponAbility.Name + ")");
-            }
-            catch
-            {
-                throw new Exception("No used Weapon defined");
-            }
+            return;
+        }
+
+        try
+        {
+            XmlDocument xml = new();
+            xml.LoadXml(core.Character.XML);
+            string number = xml.SelectSingleNode("//heldenausruestung[@name='jagtwaffe']")!.Attributes!["nummer"]!.Value;
+            XmlNode weapon = xml.SelectSingleNode("//heldenausruestung[@name='fkwaffe" + number + "']")!;
+            Ability weaponAbility = core.Character.Talente.Single(a => a.Name == weapon.Attributes!["talent"]!.Value);
+            UsedWeapon = GetWeaponByName(weapon.Attributes!["waffenname"]!.Value);
+            core.SkillWeapon = weaponAbility.Wert;
+            IsScharfschuetze = core.Character.Sonderfertigkeiten.Contains("Scharfschütze (" + weaponAbility.Name + ")");
+            IsMeisterschuetze = core.Character.Sonderfertigkeiten.Contains("Meisterschütze (" + weaponAbility.Name + ")");
+        }
+        catch
+        {
+            throw new("No used Weapon defined");
         }
     }
 
@@ -328,25 +313,25 @@ public class Hunting : MetatalentBase
     {
         string[] resultStrings = new string[2];
         string count = string.Empty;
-        (int pointsResult, string stringResult) rolldata = Roll(core.MU, core.IN, core.GE, mod);
+        (int pointsResult, string stringResult) = Roll(core.Mu, core.In, core.Ge, mod);
 
         if (multiple)
         {
-            count += "Wurf " + (intervall + 1).ToString() + ": ";
+            count += "Wurf " + (intervall + 1) + ": ";
         }
 
-        resultStrings[0] = count + rolldata.pointsResult.ToString() + "\n";
-        resultStrings[1] = count + rolldata.stringResult + "\n";
-        return (rolldata.pointsResult, resultStrings);
+        resultStrings[0] = count + pointsResult + "\n";
+        resultStrings[1] = count + stringResult + "\n";
+        return (pointsResult, resultStrings);
     }
 
     private (int[] quantityData, string[] quantityStrings) GenerateLootQuantity(string[] loot)
     {
-        string replacement = "<value>";
-        Regex variableQuantityRegex = new("([0-9]+)?\\s?bis\\s?(?:zu\\s)?([0-9]+)");
+        const string replacement = "<value>";
+        Regex variableQuantityRegex = new(@"([0-9]+)?\s?bis\s?(?:zu\s)?([0-9]+)");
         Regex fixedQuantityRegex = new("[0-9]+");
-        Regex removeBracketsRegex = new("\\(((?!\\)).)*\\)\\s?");
-        Regex unitRegex = new("[0-9]+(\\s\\w{3,})(?!\\s[0-9])");
+        Regex removeBracketsRegex = new(@"\(((?!\)).)*\)\s?");
+        Regex unitRegex = new(@"[0-9]+(\s\w{3,})(?!\s[0-9])");
         Random random = new();
         List<int> quantityData = [];
         List<string> quantityStrings = [];

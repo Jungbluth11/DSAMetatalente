@@ -1,7 +1,8 @@
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
-public readonly struct Landscape(string name, string? terrain = null)
+public readonly record struct Landscape(string Name, string? Terrain = null)
 {
-    public string Name { get; } = name ?? throw new ArgumentNullException(nameof(name));
-    public string? Terrain { get; } = terrain;
+    public string Name { get; } = Name ?? throw new ArgumentNullException(nameof(Name));
+    public string? Terrain { get; } = Terrain;
+
 }

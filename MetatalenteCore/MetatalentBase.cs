@@ -1,6 +1,6 @@
 using DSAUtils.HeldentoolInterop;
 
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
 public abstract class MetatalentBase
 {
@@ -25,11 +25,11 @@ public abstract class MetatalentBase
 
         foreach (string baseSkill in baseSkills)
         {
-            if (core.character != null)
+            if (core.Character != null)
             {
                 try
                 {
-                    Ability ability = core.character.Talente.Single(a => a.Name == baseSkill);
+                    Ability ability = core.Character.Talente.Single(a => a.Name == baseSkill);
                 }
                 catch
                 {
@@ -90,12 +90,12 @@ public abstract class MetatalentBase
     {
         if (!IsSet)
         {
-            throw new Exception("The loaded Character has not this Skill. Can't roll");
+            throw new("The loaded Character has not this Skill. Can't roll");
         }
 
         if (Duration < MinDuration)
         {
-            throw new Exception("Duration can't be less than MinDuration");
+            throw new("Duration can't be less than MinDuration");
         }
 
         if (skillPoints == 0)

@@ -1,6 +1,6 @@
-namespace DSAMetatalente.Core;
+namespace Metatalente.Core;
 
-public readonly struct Weapon
+public readonly record struct Weapon
 {
     public int MaxRange { get; }
     public string Name { get; }

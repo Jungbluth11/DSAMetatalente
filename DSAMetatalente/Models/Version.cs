@@ -1,4 +1,4 @@
-namespace DSAMetatalente;
+namespace DSAMetatalente.Models;
 
 internal struct Version
 {

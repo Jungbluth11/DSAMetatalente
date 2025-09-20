@@ -1,4 +1,4 @@
-<Project Sdk="Uno.Sdk">
+﻿<Project Sdk="Uno.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net9.0-desktop</TargetFrameworks>
 
@@ -8,7 +8,7 @@
     <!-- Display name -->
     <ApplicationTitle>DSAMetatalente</ApplicationTitle>
     <!-- App Identifier -->
-    <ApplicationId>com.companyname.DSAMetatalente</ApplicationId>
+    <ApplicationId>com.Jungbluth.DSAMetatalente</ApplicationId>
     <!-- Versions -->
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
@@ -28,8 +28,11 @@
       ThemeService;
       SkiaRenderer;
     </UnoFeatures>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Uno.CommunityToolkit.WinUI.UI" />
     <PackageReference Include="UnoGroupBox" />
   </ItemGroup>
   <ItemGroup>
@@ -38,9 +41,10 @@
   <ItemGroup>
     <Using Include="DSAMetatalente" />
     <Using Include="DSAMetatalente.Controls" />
-    <Using Include="DSAMetatalente.Core" />
+    <Using Include="DSAMetatalente.Models" />
     <Using Include="DSAMetatalente.ViewModels" />
     <Using Include="DSAMetatalente.Views" />
+    <Using Include="Metatalente.Core" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\SkillControl.xaml">
@@ -49,6 +53,21 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\ResultControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\TabForaging.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\TabPlantSeeking.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\TabHunting.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
