@@ -1,15 +1,17 @@
+using System.ComponentModel;
+
 namespace DSAMetatalente.ViewModels;
 
 public partial class TabForagingViewModel : ObservableObject
 {
+    [ObservableProperty] private bool _canRoll = true;
+    private readonly Core _core = Core.GetInstance();
+    private readonly Foraging _foraging = new();
     [ObservableProperty] private int _duration;
     [ObservableProperty] private int _minDuration;
-    [ObservableProperty] private bool _canRoll = true;
     [ObservableProperty] private string _diceResult = string.Empty;
     [ObservableProperty] private string _pointsResult = string.Empty;
     [ObservableProperty] private string _textResult = string.Empty;
-    private readonly Core _core = Core.GetInstance();
-    private readonly Foraging _foraging = new();
 
     public TabForagingViewModel()
     {
@@ -18,9 +20,16 @@ public partial class TabForagingViewModel : ObservableObject
         MinDuration = _foraging.MinDuration;
     }
 
-    private void Core_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void CheckCanRoll()
     {
-        if (e.PropertyName is "CurrentRegion" or "CurrentLandscape")
+        _foraging.SetSkill();
+
+        CanRoll = _core.CurrentRegion.ForagingMod != null && _foraging.IsSet;
+    }
+
+    private void Core_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is "CurrentRegion" or "CurrentLandscape" or "LoadCharacter")
         {
             CheckCanRoll();
         }
@@ -31,13 +40,6 @@ public partial class TabForagingViewModel : ObservableObject
         _foraging.Duration = value;
     }
 
-    private void CheckCanRoll()
-    {
-        _foraging.SetSkill();
-
-        CanRoll = _core.CurrentRegion.ForagingMod != null && _foraging.IsSet;
-    }
-
     [RelayCommand]
     private void Roll()
     {
@@ -46,5 +48,4 @@ public partial class TabForagingViewModel : ObservableObject
         PointsResult = _foraging.LastResult.PointsLeft;
         TextResult = _foraging.LastResult.TextResult;
     }
-
 }

@@ -39,6 +39,11 @@
     <ProjectReference Include="..\MetatalenteCore\MetatalenteCore.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="DSAUtils">
+      <HintPath>..\DSAUtils.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
     <Using Include="DSAMetatalente" />
     <Using Include="DSAMetatalente.Controls" />
     <Using Include="DSAMetatalente.Models" />
@@ -68,6 +73,16 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\TabHunting.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\BlankPage1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\LoadFromToolDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

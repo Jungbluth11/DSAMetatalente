@@ -13,8 +13,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!--  Add resources here  -->
-
         </ResourceDictionary>
     </Application.Resources>
-
 </Application>

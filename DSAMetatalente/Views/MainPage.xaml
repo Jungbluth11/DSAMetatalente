@@ -9,7 +9,8 @@
     xmlns:v="using:DSAMetatalente.Views"
     xmlns:vm="using:DSAMetatalente.ViewModels"
     MinWidth="1025"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Loaded="OnLoaded">
     <Page.DataContext>
         <vm:MainPageViewModel />
     </Page.DataContext>
@@ -24,20 +25,26 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <MenuBar>
                 <MenuBarItem Title="Charakter laden">
-                    <MenuFlyoutItem Click="MenuCharacterLoadFromTool_OnClick" Text="... aus Heldentool" />
+                    <MenuFlyoutItem
+                        Click="MenuCharacterLoadFromTool_OnClick"
+                        IsEnabled="{Binding CanLoadFromTool}"
+                        Text="... aus Heldentool" />
                     <MenuFlyoutItem Click="MenuCharacterLoadFromFile_OnClick" Text="... aus Datei" />
                 </MenuBarItem>
                 <MenuBarItem Title="Option">
                     <MenuFlyoutSubItem Text="Theme">
                         <RadioMenuFlyoutItem
+                            x:Name="MenuThemeLight"
                             Click="MenuThemeLight_OnClick"
                             GroupName="Theme"
                             Text="Hell" />
                         <RadioMenuFlyoutItem
+                            x:Name="MenuThemeDark"
                             Click="MenuThemeDark_OnClick"
                             GroupName="Theme"
                             Text="Dunkel" />
                         <RadioMenuFlyoutItem
+                            x:Name="MenuThemeSystem"
                             Click="MenuThemeSystem_OnClick"
                             GroupName="Theme"
                             Text="System" />

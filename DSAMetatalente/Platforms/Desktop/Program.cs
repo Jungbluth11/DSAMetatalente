@@ -1,6 +1,5 @@
-using Uno.UI.Hosting;
-
 namespace DSAMetatalente;
+
 internal class Program
 {
     [STAThread]
@@ -8,7 +7,7 @@ internal class Program
     {
         App.InitializeLogging();
 
-        var host = UnoPlatformHostBuilder.Create()
+        UnoPlatformHost host = UnoPlatformHostBuilder.Create()
             .App(() => new App())
             .UseX11()
             .UseLinuxFrameBuffer()

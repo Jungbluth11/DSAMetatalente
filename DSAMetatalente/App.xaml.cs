@@ -1,67 +1,22 @@
-using System;
-using Microsoft.Extensions.Logging;
-using Uno.Resizetizer;
+using Uno.UI.Adapter.Microsoft.Extensions.Logging;
 
 namespace DSAMetatalente;
+
 public partial class App : Application
 {
+    protected Window? MainWindow { get; private set; }
+
     /// <summary>
-    /// Initializes the singleton application object. This is the first line of authored code
-    /// executed, and as such is the logical equivalent of main() or WinMain().
+    ///     Initializes the singleton application object. This is the first line of authored code
+    ///     executed, and as such is the logical equivalent of main() or WinMain().
     /// </summary>
     public App()
     {
-        this.InitializeComponent();
-    }
-
-    protected Window? MainWindow { get; private set; }
-
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
-    {
-        MainWindow = new Window();
-#if DEBUG
-        MainWindow.UseStudio();
-#endif
-
-
-        // Do not repeat app initialization when the Window already has content,
-        // just ensure that the window is active
-        if (MainWindow.Content is not Frame rootFrame)
-        {
-            // Create a Frame to act as the navigation context and navigate to the first page
-            rootFrame = new Frame();
-
-            // Place the frame in the current Window
-            MainWindow.Content = rootFrame;
-
-            rootFrame.NavigationFailed += OnNavigationFailed;
-        }
-
-        if (rootFrame.Content == null)
-        {
-            // When the navigation stack isn't restored navigate to the first page,
-            // configuring the new page by passing required information as a navigation
-            // parameter
-            rootFrame.Navigate(typeof(MainPage), args.Arguments);
-        }
-
-        MainWindow.SetWindowIcon();
-        // Ensure the current window is active
-        MainWindow.Activate();
+        InitializeComponent();
     }
 
     /// <summary>
-    /// Invoked when Navigation to a certain page fails
-    /// </summary>
-    /// <param name="sender">The Frame which failed navigation</param>
-    /// <param name="e">Details about the navigation failure</param>
-    void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
-    {
-        throw new InvalidOperationException($"Failed to load {e.SourcePageType.FullName}: {e.Exception}");
-    }
-
-    /// <summary>
-    /// Configures global Uno Platform logging
+    ///     Configures global Uno Platform logging
     /// </summary>
     public static void InitializeLogging()
     {
@@ -73,7 +28,7 @@ public partial class App : Application
         //
         // For more performance documentation: https://platform.uno/docs/articles/Uno-UI-Performance.html
 
-        var factory = LoggerFactory.Create(builder =>
+        ILoggerFactory factory = LoggerFactory.Create(builder =>
         {
 #if __WASM__
             builder.AddProvider(new global::Uno.Extensions.Logging.WebAssembly.WebAssemblyConsoleLoggerProvider());
@@ -122,11 +77,54 @@ public partial class App : Application
             // builder.AddFilter("Uno.Foundation.WebAssemblyRuntime", LogLevel.Debug );
         });
 
-        global::Uno.Extensions.LogExtensionPoint.AmbientLoggerFactory = factory;
+        LogExtensionPoint.AmbientLoggerFactory = factory;
 
 #if HAS_UNO
-        global::Uno.UI.Adapter.Microsoft.Extensions.Logging.LoggingAdapter.Initialize();
+        LoggingAdapter.Initialize();
 #endif
 #endif
+    }
+
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    {
+        MainWindow = new();
+#if DEBUG
+        MainWindow.UseStudio();
+#endif
+
+        // Do not repeat app initialization when the Window already has content,
+        // just ensure that the window is active
+        if (MainWindow.Content is not Frame rootFrame)
+        {
+            // Create a Frame to act as the navigation context and navigate to the first page
+            rootFrame = new();
+
+            // Place the frame in the current Window
+            MainWindow.Content = rootFrame;
+
+            rootFrame.NavigationFailed += OnNavigationFailed;
+        }
+
+        if (rootFrame.Content == null)
+        {
+            // When the navigation stack isn't restored navigate to the first page,
+            // configuring the new page by passing required information as a navigation
+            // parameter
+            rootFrame.Navigate(typeof(MainPage), args.Arguments);
+        }
+
+        MainWindow.SetWindowIcon();
+        // Ensure the current window is active
+        MainWindow.Activate();
+    }
+
+    /// <summary>
+    ///     Invoked when Navigation to a certain page fails
+    /// </summary>
+    /// <param name="sender">The Frame which failed navigation</param>
+    /// <param name="e">Details about the navigation failure</param>
+    private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+    {
+        throw new InvalidOperationException($"Failed to load {e.SourcePageType.FullName}: {e.Exception}");
     }
 }

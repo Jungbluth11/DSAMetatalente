@@ -1,25 +1,25 @@
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace DSAMetatalente.ViewModels;
 
 public partial class TabHuntingViewModel : ObservableObject
 {
+    [ObservableProperty] private bool _canRoll = true;
+    [ObservableProperty] private bool _coincidence;
+    [ObservableProperty] private bool _isMeisterschuetze;
+    [ObservableProperty] private bool _isScharfschuetze;
     private readonly Core _core = Core.GetInstance();
     private readonly Hunting _hunting = new();
     [ObservableProperty] private int _duration;
     [ObservableProperty] private int _minDuration;
-    [ObservableProperty] private bool _coincidence;
-    [ObservableProperty] private bool _canRoll = true;
-    [ObservableProperty] private bool _isMeisterschuetze;
-    [ObservableProperty] private bool _isScharfschuetze;
+    [ObservableProperty] private int _skillWeapon;
+    [ObservableProperty] private string _currentAnimal;
     [ObservableProperty] private string _diceResult = string.Empty;
-    [ObservableProperty] private string _pointsResult = string.Empty;
-    [ObservableProperty] private string _textResult = string.Empty;
     [ObservableProperty] private string _difficulty = string.Empty;
     [ObservableProperty] private string _loot = string.Empty;
-    [ObservableProperty] private string _currentAnimal;
+    [ObservableProperty] private string _pointsResult = string.Empty;
+    [ObservableProperty] private string _textResult = string.Empty;
     [ObservableProperty] private string _usedWeapon;
-    [ObservableProperty] private int _skillWeapon;
 
     public ObservableCollection<string> Animals { get; } = [];
     public IEnumerable<string> Weapons => from Weapon in Hunting.Weapons select Weapon.Name;
@@ -33,7 +33,17 @@ public partial class TabHuntingViewModel : ObservableObject
         UsedWeapon = _hunting.UsedWeapon.Name;
     }
 
-    private void Core_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void CheckCanRoll()
+    {
+        _hunting.SetSkill();
+
+        if (_core.CurrentRegion.WildlifeMod != null)
+        {
+            CanRoll = _hunting.IsSet;
+        }
+    }
+
+    private void Core_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
         {
@@ -42,21 +52,13 @@ public partial class TabHuntingViewModel : ObservableObject
                 Animals.Clear();
                 Animals.AddRange([.. _core.CurrentRegion.Animals]);
                 CurrentAnimal = Animals.Count > 0 ? Animals[0] : string.Empty;
+
                 break;
             case "LoadCharacter":
+                CheckCanRoll();
                 LoadCharacter();
+
                 break;
-        }
-    }
-
-    private void CheckCanRoll()
-    {
-
-        _hunting.SetSkill();
-
-        if (_core.CurrentRegion.WildlifeMod != null)
-        {
-            CanRoll = _hunting.IsSet;
         }
     }
 
@@ -70,20 +72,14 @@ public partial class TabHuntingViewModel : ObservableObject
             IsScharfschuetze = _hunting.IsScharfschuetze;
             IsMeisterschuetze = _hunting.IsMeisterschuetze;
         }
-        // ReSharper disable once EmptyGeneralCatchClause --- there's nothing to do on error, maybe character has no weapons
         catch
         {
         }
     }
 
-    partial void OnSkillWeaponChanged(int value)
+    partial void OnCoincidenceChanged(bool value)
     {
-        _core.SkillWeapon = value;
-    }
-
-    partial void OnDurationChanged(int value)
-    {
-        _hunting.Duration = value;
+        _hunting.Coincidence = value;
     }
 
     partial void OnCurrentAnimalChanged(string value)
@@ -98,9 +94,14 @@ public partial class TabHuntingViewModel : ObservableObject
         Difficulty = _hunting.CurrentAnimal.Difficulty.ToString().Insert(0, "+");
     }
 
-    partial void OnCoincidenceChanged(bool value)
+    partial void OnDurationChanged(int value)
     {
-        _hunting.Coincidence = value;
+        _hunting.Duration = value;
+    }
+
+    partial void OnSkillWeaponChanged(int value)
+    {
+        _core.SkillWeapon = value;
     }
 
     partial void OnUsedWeaponChanged(string value)

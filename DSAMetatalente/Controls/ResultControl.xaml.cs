@@ -1,5 +1,3 @@
-using UnoGroupBox;
-
 namespace DSAMetatalente.Controls;
 
 public sealed partial class ResultControl : UserControl

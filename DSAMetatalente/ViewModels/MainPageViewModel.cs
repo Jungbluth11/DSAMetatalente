@@ -1,35 +1,31 @@
-using System.Collections.ObjectModel;
-using System.Net;
-using System.Reflection;
-using System.Text.Json;
-using Windows.System;
 using Version = DSAMetatalente.Models.Version;
 
 namespace DSAMetatalente.ViewModels;
 
-public partial class MainPageViewModel : ObservableObject
+public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
 {
-    private const string UpdateLinkBase = "https://api.jungbluthcloud.de/updates/dsametatalente/";
-    private const string VersionLink = "https://api.jungbluthcloud.de/updates/dsametatalente/version";
-    [ObservableProperty] private bool _isKnownTerrain;
-    [ObservableProperty] private bool _isUpdateAvailable;
-    [ObservableProperty] private int _ff;
-    [ObservableProperty] private int _ge;
-    [ObservableProperty] private int _in;
-    [ObservableProperty] private int _mu;
-    [ObservableProperty] private int _skillFaehrtensuchen;
-    [ObservableProperty] private int _skillPflanzenkunde;
-    [ObservableProperty] private int _skillSchleichen;
-    [ObservableProperty] private int _skillSichVerstecken;
-    [ObservableProperty] private int _skillSinnenschaerfe;
-    [ObservableProperty] private int _skillTierkunde;
-    [ObservableProperty] private int _skillWildnisleben;
-    [ObservableProperty] private string _currentLandscape;
-    [ObservableProperty] private string _currentMonth;
-    [ObservableProperty] private string _currentRegion;
-    [ObservableProperty] private string _descriptionForaging = string.Empty;
-    [ObservableProperty] private string _descriptionKnownTerrain = string.Empty;
-    [ObservableProperty] private string _descriptionWildlife = string.Empty;
+    const string UpdateLinkBase = "https://api.jungbluthcloud.de/updates/dsametatalente/";
+    const string VersionLink = "https://api.jungbluthcloud.de/updates/dsametatalente/version";
+    [ObservableProperty] bool _isKnownTerrain;
+    [ObservableProperty] bool _isUpdateAvailable;
+    [ObservableProperty] int _ff;
+    [ObservableProperty] int _ge;
+    [ObservableProperty] int _in;
+    [ObservableProperty] int _mu;
+    [ObservableProperty] int _skillFaehrtensuchen;
+    [ObservableProperty] int _skillPflanzenkunde;
+    [ObservableProperty] int _skillSchleichen;
+    [ObservableProperty] int _skillSichVerstecken;
+    [ObservableProperty] int _skillSinnenschaerfe;
+    [ObservableProperty] int _skillTierkunde;
+    [ObservableProperty] int _skillWildnisleben;
+    [ObservableProperty] string _currentLandscape;
+    [ObservableProperty] string _currentMonth;
+    [ObservableProperty] string _currentRegion;
+    [ObservableProperty] string _descriptionForaging = string.Empty;
+    [ObservableProperty] string _descriptionKnownTerrain = string.Empty;
+    [ObservableProperty] string _descriptionWildlife = string.Empty;
+    public bool CanLoadFromTool => Core.IsHeldenToolInstalled;
     public Core Core { get; } = Core.GetInstance();
     public ObservableCollection<string> KnownTerrains { get; private set; } = [];
     public ObservableCollection<string> Landscapes { get; } = [];
@@ -38,6 +34,7 @@ public partial class MainPageViewModel : ObservableObject
 
     public MainPageViewModel()
     {
+        WeakReferenceMessenger.Default.Register(this);
         CurrentMonth = Core.CurrentMonth;
         CurrentRegion = Core.CurrentRegion.Name;
         CurrentLandscape = Core.CurrentLandscape.Name;
@@ -52,7 +49,19 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    private bool CheckForUpdates()
+    public void Receive(Charakter message)
+    {
+        Core.LoadCharacter(message);
+        LoadCharacter();
+    }
+
+    public void LoadCharacterFromFile(string filePath)
+    {
+        Core.LoadCharacterFromFile(filePath);
+        LoadCharacter();
+    }
+
+    bool CheckForUpdates()
     {
         try
         {
@@ -82,11 +91,8 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    // ReSharper disable once UnusedMember.Local
-    private void LoadCharacter()
+    void LoadCharacter()
     {
-
-
         Mu = Core.Mu;
         In = Core.In;
         Ge = Core.Ge;
@@ -99,11 +105,10 @@ public partial class MainPageViewModel : ObservableObject
         SkillSchleichen = Core.SkillSchleichen;
         KnownTerrains = [.. Core.KnownTerrains];
         IsKnownTerrain = Core.IsKnownTerrain;
-
     }
 
     [RelayCommand]
-    private void Update()
+    void Update()
     {
         if (OperatingSystem.IsLinux())
         {
@@ -178,7 +183,7 @@ public partial class MainPageViewModel : ObservableObject
         Core.SkillSichVerstecken = value;
     }
 
-    #endregion
+    #endregion character
 
     #region environment
 
@@ -199,7 +204,6 @@ public partial class MainPageViewModel : ObservableObject
         {
             CurrentLandscape = Landscapes[0];
         }
-
     }
 
     partial void OnCurrentLandscapeChanged(string value)
@@ -226,5 +230,5 @@ public partial class MainPageViewModel : ObservableObject
         Core.IsKnownTerrain = value;
     }
 
-    #endregion
+    #endregion environment
 }
