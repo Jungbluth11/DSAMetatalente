@@ -4,13 +4,13 @@ public sealed partial class SkillControl : UserControl
 {
     public string Text
     {
-        get => (string)GetValue(TextProperty);
+        get => (string) GetValue(TextProperty);
         set => SetValue(TextProperty, value);
     }
 
     public int Value
     {
-        get => (int)GetValue(ValueProperty);
+        get => (int) GetValue(ValueProperty);
         set => SetValue(ValueProperty, value);
     }
 
@@ -37,7 +37,7 @@ public sealed partial class SkillControl : UserControl
     private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         ((d as UserControl)!.Content as Grid)!.Children.OfType<NumberBox>().FirstOrDefault()!.Value =
-            (int)e.NewValue;
+            (int) e.NewValue;
     }
 
     private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)

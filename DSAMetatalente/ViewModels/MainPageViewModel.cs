@@ -4,27 +4,27 @@ namespace DSAMetatalente.ViewModels;
 
 public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
 {
-    const string UpdateLinkBase = "https://api.jungbluthcloud.de/updates/dsametatalente/";
-    const string VersionLink = "https://api.jungbluthcloud.de/updates/dsametatalente/version";
-    [ObservableProperty] bool _isKnownTerrain;
-    [ObservableProperty] bool _isUpdateAvailable;
-    [ObservableProperty] int _ff;
-    [ObservableProperty] int _ge;
-    [ObservableProperty] int _in;
-    [ObservableProperty] int _mu;
-    [ObservableProperty] int _skillFaehrtensuchen;
-    [ObservableProperty] int _skillPflanzenkunde;
-    [ObservableProperty] int _skillSchleichen;
-    [ObservableProperty] int _skillSichVerstecken;
-    [ObservableProperty] int _skillSinnenschaerfe;
-    [ObservableProperty] int _skillTierkunde;
-    [ObservableProperty] int _skillWildnisleben;
-    [ObservableProperty] string _currentLandscape;
-    [ObservableProperty] string _currentMonth;
-    [ObservableProperty] string _currentRegion;
-    [ObservableProperty] string _descriptionForaging = string.Empty;
-    [ObservableProperty] string _descriptionKnownTerrain = string.Empty;
-    [ObservableProperty] string _descriptionWildlife = string.Empty;
+    private const string UpdateLinkBase = "https://api.jungbluthcloud.de/updates/dsametatalente/";
+    private const string VersionLink = "https://api.jungbluthcloud.de/updates/dsametatalente/version";
+    [ObservableProperty] private bool _isKnownTerrain;
+    [ObservableProperty] private bool _isUpdateAvailable;
+    [ObservableProperty] private int _ff;
+    [ObservableProperty] private int _ge;
+    [ObservableProperty] private int _in;
+    [ObservableProperty] private int _mu;
+    [ObservableProperty] private int _skillFaehrtensuchen;
+    [ObservableProperty] private int _skillPflanzenkunde;
+    [ObservableProperty] private int _skillSchleichen;
+    [ObservableProperty] private int _skillSichVerstecken;
+    [ObservableProperty] private int _skillSinnenschaerfe;
+    [ObservableProperty] private int _skillTierkunde;
+    [ObservableProperty] private int _skillWildnisleben;
+    [ObservableProperty] private string _currentLandscape;
+    [ObservableProperty] private string _currentMonth;
+    [ObservableProperty] private string _currentRegion;
+    [ObservableProperty] private string _descriptionForaging = string.Empty;
+    [ObservableProperty] private string _descriptionKnownTerrain = string.Empty;
+    [ObservableProperty] private string _descriptionWildlife = string.Empty;
     public bool CanLoadFromTool => Core.IsHeldenToolInstalled;
     public Core Core { get; } = Core.GetInstance();
     public ObservableCollection<string> KnownTerrains { get; private set; } = [];
@@ -61,7 +61,7 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
         LoadCharacter();
     }
 
-    bool CheckForUpdates()
+    private bool CheckForUpdates()
     {
         try
         {
@@ -91,7 +91,7 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
         }
     }
 
-    void LoadCharacter()
+    private void LoadCharacter()
     {
         Mu = Core.Mu;
         In = Core.In;
@@ -108,7 +108,7 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
     }
 
     [RelayCommand]
-    void Update()
+    private void Update()
     {
         if (OperatingSystem.IsLinux())
         {

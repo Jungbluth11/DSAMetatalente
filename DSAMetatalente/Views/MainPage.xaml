@@ -74,17 +74,22 @@
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
                 <TextBlock Margin="10,10,0,10" Text="MU" />
-                <NumberBox SpinButtonPlacementMode="Compact" Value="{Binding Mu, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <NumberBox SpinButtonPlacementMode="Compact"
+                           Value="{Binding Mu, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 <TextBlock Margin="20,10,0,10" Text="IN" />
-                <NumberBox SpinButtonPlacementMode="Compact" Value="{Binding In, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <NumberBox SpinButtonPlacementMode="Compact"
+                           Value="{Binding In, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 <TextBlock Margin="20,10,0,10" Text="GE" />
-                <NumberBox SpinButtonPlacementMode="Compact" Value="{Binding Ge, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <NumberBox SpinButtonPlacementMode="Compact"
+                           Value="{Binding Ge, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 <TextBlock Margin="20,10,0,10" Text="FF" />
-                <NumberBox SpinButtonPlacementMode="Compact" Value="{Binding Ff, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <NumberBox SpinButtonPlacementMode="Compact"
+                           Value="{Binding Ff, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="0">
                 <StackPanel Height="220">
-                    <controls:SkillControl Text="Wildnisleben" Value="{Binding SkillWildnisleben, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <controls:SkillControl Text="Wildnisleben"
+                                           Value="{Binding SkillWildnisleben, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <controls:SkillControl
                         x:Name="SkillSinnenschaerfe"
                         Text="Sinnenschärfe"

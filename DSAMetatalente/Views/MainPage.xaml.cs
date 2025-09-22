@@ -19,7 +19,7 @@ public sealed partial class MainPage : Page
         {
             FileOpenPicker fileOpenPicker = new()
             {
-                FileTypeFilter = { ".xml" },
+                FileTypeFilter = {".xml"},
                 CommitButtonText = "Auswählen"
             };
 
@@ -96,7 +96,7 @@ public sealed partial class MainPage : Page
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        switch ((string)_localSettings.Values["theme"])
+        switch ((string) _localSettings.Values["theme"])
         {
             case "Light":
                 (XamlRoot!.Content as FrameworkElement)!.RequestedTheme = ElementTheme.Light;
