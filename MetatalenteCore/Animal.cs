@@ -1,28 +1,16 @@
-﻿namespace Metatalente.Core
-{
-    public readonly struct Animal
-    {
-        public int Difficulty { get; }
-        public string Name { get; }
-        public string LootDisplayText
-        {
-            get
-            {
-                string text = string.Empty;
-                foreach (string item in Loot)
-                {
-                    text += item + ", ";
-                }
-                return text.TrimEnd(',');
-            }
-        }
-        public string[] Loot { get; }
+namespace Metatalente.Core;
 
-        public Animal(int difficulty, string name, string[] loot)
+public readonly record struct Animal(int Difficulty, string Name, string[] Loot)
+{
+    public string Name { get; } = Name ?? throw new ArgumentNullException(nameof(Name));
+
+    public string LootDisplayText
+    {
+        get
         {
-            Difficulty = difficulty;
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Loot = loot ?? throw new ArgumentNullException(nameof(loot));
+            string text = Loot.Aggregate(string.Empty, (current, item) => current + (item + ", "));
+            return text.TrimEnd(',');
         }
     }
+    public string[] Loot { get; } = Loot ?? throw new ArgumentNullException(nameof(Loot));
 }

@@ -1,331 +1,350 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
-namespace Metatalente.Core
+namespace Metatalente.Core;
+
+public class PlantSeeking : MetatalentBase
 {
-    public class PlantSeeking : MetatalentBase
+    private readonly Random _random = new();
+    public bool Coincidence { get; set; } = false;
+    public Plant CurrentPlant { get; set; } = Plants[0];
+
+    #region hard coded data
+
+    public static Plant[] Plants =>
+    [
+        new(9, "Alraune", ["1 Pflanze"], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche", "Waldrand"], [Occur.Rare, Occur.Rare ]),
+        new(-5, "Alveranie", ["12 Blätter, jeweils in der Farbe des Monats" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja" ], ["Eis", "Wüste und Wüstenrand", "Gebirge", "Hochland", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor", "Regenwald", "Wald", "Waldrand"], [Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare ]),
+        new(4, "Arganstrauch", ["1 Wurzel" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Sumpf und Moor", "Regenwald", "Wald"], [Occur.Rare, Occur.Modest, Occur.VeryRare ]),
+        new(6, "Atan-Kiefer", ["W20 Stein Rinde, bei komplettem Abschälen Verdreifachung des Wertes" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Gebirge"], [Occur.Rare ]),
+        new(5, "Atmon", ["W6 Büschel" ], ["Peraine" ], ["Hochland", "Steppe", "Flussauen", "Sumpf und Moor"], [Occur.Rare, Occur.Modest, Occur.VeryRare, Occur.VeryRare ]),
+        new(4, "Axorda-Baum", ["1 Baum" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Gebirge", "Regenwald"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(15, "Basilamine", ["W20+10 Schoten" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wald", "Waldrand"], [Occur.Modest, Occur.Rare ]),
+        new(6, "Belmart", ["2W20 Blätter" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wald", "Waldrand"], [Occur.Modest, Occur.Rare ]),
+        new(4, "Blutblatt", ["W20+2 Zweige pro 10 AsP der Quelle" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Eis", "Wüste und Wüstenrand", "Gebirge", "Hochland", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Küste, Strand", "Flussauen", "Sumpf und Moor", "Regenwald", "Wald", "Waldrand"], [Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare ]),
+        new(-2, "Boronie", ["5 Blüten, die kurz vor dem Verblühen sind" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Grasland, Wiesen", "Regenwald"], [Occur.VeryRare, Occur.Rare ]),
+        new(15, "Boronsschlinge", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Regenwald", "Wald"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(5, "Carlog", ["W6 Blüten", " mit je 1 Stempel" ], ["Efferd", "Peraine" ], ["Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor"], [Occur.Rare, Occur.VeryRare, Occur.Modest ]),
+        new(4, "Cheria-Kaktus", ["W3 Stein Kaktusfleisch", " und pro Stein 3W6+8 Stacheln" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wüste und Wüstenrand"], [Occur.Rare ]),
+        new(6, "Chonchinis", ["W20 Blätter" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Hochland", "Steppe", "Waldrand"], [Occur.VeryRare, Occur.Modest, Occur.Rare ]),
+        new(5, "Disdychonda", ["4 Blätter" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Regenwald", "Wald"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(6, "Donf", ["1 Stängel" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor"], [Occur.Rare, Occur.VeryRare, Occur.Modest ]),
+        new(3, "Dornrose", ["Strauch mit W6 Blüten" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Grasland, Wiesen", "Wald"], [Occur.Common, Occur.Modest ]),
+        new(4, "Efeuer", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wald", "Höhle (feucht)", "Höhle (trocken)"], [Occur.Rare, Occur.Modest, Occur.Modest ]),
+        new(6, "Egelschreck", ["2W20 Blätter" ], ["Rondra", "Efferd" ], ["Grasland, Wiesen", "Flussauen", "Sumpf und Moor", "Waldrand"], [Occur.Modest, Occur.Modest, Occur.Common, Occur.Rare ]),
+        new(2, "Eitriger Krötenschemel", ["2W6 Pilzhäute" ], ["Efferd", "Travia", "Boron" ], ["Flussauen", "Sumpf und Moor", "Wald"], [Occur.Rare, Occur.Modest, Occur.VeryRare ]),
+        new(15, "Feuermoos und Efferdmoos", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Höhle (feucht)"], [Occur.Modest ]),
+        new(6, "Feuerschlick", ["W6 Stein der Algen" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Küste, Strand", "Meer"], [Occur.Common, Occur.VeryRare ]),
+        new(5, "Finage", ["Baum mit W20 Trieben", " und Bast" ], ["Boron", "Hesinde", "Firun", "Peraine" ], ["Grasland, Wiesen", "Regenwald", "Wald"], [Occur.VeryRare, Occur.Rare, Occur.Rare ]),
+        new(4, "Grüne Schleimschlange", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Flussauen", "Sumpf und Moor"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(6, "Gulmond", ["2W6 Blätter" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Hochland", "Steppe", "Wald"], [Occur.Modest, Occur.Common, Occur.Modest ]),
+        new(8, "Hiradwurz", ["1 Wurzel" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Steppe"], [Occur.Rare ]),
+        new(4, "Hollbeere", ["2W6 Sträucher", " mit jeweils 2W6+5 Beeren", " und 2W6+3 Blätter der untersten Zweige" ], ["Rondra", "Efferd" ], ["Wald", "Waldrand"], [Occur.Modest, Occur.Common ]),
+        new(8, "Höllenkraut", ["W10 Stein der Ranken" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Regenwald", "Wald", "Waldrand"], [Occur.Common, Occur.Rare, Occur.VeryRare ]),
+        new(7, "Horusche", ["W6 erntereife Schoten", " mit je W3 Kernen" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wald"], [Occur.Rare ]),
+        new(2, "Ilmenblatt", ["W20 Blätter", " und W20 Blüten" ], ["Travia", "Ingerimm" ], ["Gebirge", "Grasland, Wiesen", "Wald"], [Occur.VeryRare, Occur.Modest, Occur.Modest ]),
+        new(12, "Iribaarslilie", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Sumpf und Moor"], [Occur.VeryRare ]),
+        new(15, "Jagdgras", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Gebirge", "Hochland", "Steppe", "Wald"], [Occur.Modest, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare ]),
+        new(7, "Joruga", ["1 Wurzel" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Rahja", "Namenlose Tage" ], ["Gebirge", "Grasland, Wiesen", "Wald"], [Occur.VeryRare, Occur.Rare, Occur.Modest ]),
+        new(6, "Kairan", ["1 Halm" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche"], [Occur.Rare ]),
+        new(4, "Kajubo", ["2W6 Knospen (Nur die Hälfte um den Strauch zu schonen)" ], ["Praios", "Rondra", "Efferd", "Travia", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Küste, Strand", "Waldrand"], [Occur.Rare, Occur.Rare ]),
+        new(12, "Khôm- oder Mhanadiknolle", ["1 Wurzel", " mit W6 Maß klarem Wasser" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wüste und Wüstenrand", "Steppe"], [Occur.VeryRare, Occur.Rare ]),
+        new(8, "Klippenzahn", ["2W6 Stängel" ], ["Praios", "Rondra", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Gebirge", "Hochland"], [Occur.Modest, Occur.Modest ]),
+        new(10, "Kukuka", ["1W3 x 20 Blätter" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Regenwald"], [Occur.Rare ]),
+        new(9, "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", ["2W6+1 Blüten" ], ["Praios", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche"], [Occur.Modest ]),
+        new(7, "Purpurner Lotus", ["W6+1 Blüten" ], ["Praios", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche"], [Occur.Rare ]),
+        new(6, "Schwarzer Lotus", ["W6 Blüten" ], ["Praios", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche"], [Occur.VeryRare ]),
+        new(8, "Grauer Lotus", ["W6+1 Blüten" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche", "Sumpf und Moor"], [Occur.Rare, Occur.VeryRare ]),
+        new(10, "Weißer Lotus", ["W6+1 Blüten" ], ["Praios", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche", "Sumpf und Moor"], [Occur.Rare, Occur.VeryRare ]),
+        new(10, "Weißgelber Lotus", ["W3 Blüten" ], ["Praios", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche"], [Occur.Modest ]),
+        new(5, "Lulanie", ["1 Blüte" ], ["Praios", "Rondra", "Rahja", "Namenlose Tage" ], ["Wald", "Waldrand"], [Occur.Rare, Occur.VeryRare ]),
+        new(15, "Madablüte", ["1 Blüte" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Gebirge", "Steppe"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(4, "Menchal-Kaktus", ["1 Kaktus", " mit W3 Maß Menchalsaft; bei 1 auf W20 außerdem mit W6 Blüten" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wüste und Wüstenrand", "Hochland"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(2, "Merach-Strauch", ["2W20 reife Früchte" ], ["Efferd", "Travia" ], ["Regenwald", "Wald"], [Occur.Rare, Occur.VeryRare ]),
+        new(6, "Messergras", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wüste und Wüstenrand", "Hochland", "Steppe"], [Occur.VeryRare, Occur.VeryRare, Occur.Rare ]),
+        new(10, "Mibelrohr", ["2W6 Kolben" ], ["Praios", "Rondra", "Efferd", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor"], [Occur.Modest, Occur.Rare, Occur.VeryRare ]),
+        new(8, "Mirbelstein", ["1 Wurzelknolle" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Hochland", "Grasland, Wiesen", "Wald"], [Occur.Rare, Occur.Modest, Occur.Common ]),
+        new(4, "Mirhamer Seidenliane", ["1 Ranke", " mit W2+1 Knoten" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Gebirge", "Fluss- und Seeufer, Teiche", "Regenwald"], [Occur.VeryRare, Occur.VeryRare, Occur.Rare ]),
+        new(5, "Bleichmohn (Weißer Mohn)", ["W6 geschlossene Samenkapseln" ], ["Rondra" ], ["Gebirge"], [Occur.Rare ]),
+        new(-5, "Bunter Mohn", ["1 geschlossene Samenkapsel" ], ["Travia" ], ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Waldrand"], [Occur.Common, Occur.Modest, Occur.Rare ]),
+        new(1, "Grauer Mohn", ["1 geschlossene Samenkapsel und 1 Blüte" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Gebirge"], [Occur.VeryRare ]),
+        new(3, "Purpurmohn", ["1 geschlossene Samenkapsel" ], ["Rahja" ], ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Wald"], [Occur.Rare, Occur.VeryRare, Occur.VeryRare ]),
+        new(5, "Schwarzer Mohn", ["2 Blätter", " und 1 geschlossene Samenkapsel" ], ["Efferd", "Travia", "Boron" ], ["Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], [Occur.VeryCommon, Occur.VeryCommon, Occur.VeryCommon, Occur.VeryCommon, Occur.VeryCommon, Occur.VeryCommon ]),
+        new(10, "Tigermohn", ["1 geschlossene Samenkapsel" ], ["Travia" ], ["Grasland, Wiesen", "Flussauen", "Waldrand"], [Occur.Rare, Occur.Rare, Occur.Rare ]),
+        new(13, "Morgendornstrauch", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Sumpf und Moor"], [Occur.Rare ]),
+        new(1, "Naftanstaude", ["1 Staude" ], ["Praios", "Rondra", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Steppe", "Grasland, Wiesen", "Waldrand"], [Occur.VeryRare, Occur.Rare, Occur.VeryRare ]),
+        new(4, "Neckerkraut", ["W20+5 Blätter" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Grasland, Wiesen", "Küste, Strand", "Sumpf und Moor"], [Occur.Rare, Occur.Modest, Occur.VeryRare ]),
+        new(6, "Nothilf", ["W20+2 Blüten", " und 2W20+10 Blätter" ], ["Praios", "Peraine" ], ["Gebirge", "Wald"], [Occur.Rare, Occur.Rare ]),
+        new(10, "Olginwurz", ["W3 Moosballen" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Gebirge", "Hochland", "Wald"], [Occur.Rare, Occur.Rare, Occur.Rare ]),
+        new(4, "Orazal", ["W6 verholzte Stängel" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Regenwald", "Wald"], [Occur.Rare, Occur.VeryRare ]),
+        new(4, "Orklandbovist", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Hochland", "Steppe", "Wald"], [Occur.Rare, Occur.VeryRare, Occur.VeryRare ]),
+        new(6, "Pestsporenpilz", ["1 Pilzhaut" ], ["Efferd", "Travia", "Boron", "Peraine", "Ingerimm", "Rahja" ], ["Grasland, Wiesen", "Sumpf und Moor", "Wald"], [Occur.Rare, Occur.Rare, Occur.VeryRare ]),
+        new(10, "Phosphorpilz", ["W6 Stein Geflechtstücke" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Höhle (feucht)", "Höhle (trocken)"], [Occur.Modest, Occur.Rare ]),
+        new(12, "Quasselwurz", ["1 Wurzel" ], ["Praios", "Rondra", "Efferd", "Travia", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wald"], [Occur.Rare ]),
+        new(6, "Quinja", ["W3+2 Beeren" ], ["Praios", "Rondra", "Efferd", "Travia", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Regenwald", "Wald", "Waldrand"], [Occur.Common, Occur.Modest, Occur.Rare ]),
+        new(5, "Rahjalieb", ["2W6 Blätter" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Grasland, Wiesen", "Sumpf und Moor", "Regenwald", "Wald"], [Occur.Modest, Occur.Modest, Occur.Common, Occur.Modest ]),
+        new(7, "Rattenpilz", ["1 Pilz" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Gebirge", "Hochland", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Küste, Strand", "Flussauen", "Sumpf und Moor", "Regenwald", "Wald", "Waldrand"], [Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare ]),
+        new(3, "Rauschgurke", ["3W6 reife Rauschgurken" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wald", "Waldrand"], [Occur.Modest, Occur.Rare ]),
+        new(7, "Rote Pfeilblüte", ["W6 Blüten" ], ["Peraine", "Ingerimm", "Rahja" ], ["Sumpf und Moor", "Regenwald", "Wald"], [Occur.Modest, Occur.Modest, Occur.VeryRare ]),
+        new(10, "Roter Drachenschlund", ["W6 Blätter" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche", "Waldrand"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(12, "Sansaro", ["1 Pflanze" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Küste, Strand", "Meer"], [Occur.Common, Occur.Rare ]),
+        new(-2, "Satuariensbusch", ["4W20 Blätter,", " W20 Blüten,", " W20 Früchte,", " W3 Flux Saft" ], ["Praios", "Efferd", "Travia", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wald", "Waldrand"], [Occur.Modest, Occur.Modest ]),
+        new(3, "Schlangenzünglein", ["Saft einer Pflanze" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche", "Sumpf und Moor", "Regenwald"], [Occur.Rare, Occur.Rare, Occur.VeryRare ]),
+        new(6, "Schleichender Tod", ["W6 Blüten" ], ["Ingerimm", "Rahja" ], ["Fluss- und Seeufer, Teiche", "Waldrand"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(3, "Schleimiger Sumpfknöterich", ["2W6 Pilze" ], ["Praios", "Rondra", "Efferd", "Travia" ], ["Wald", "Waldrand"], [Occur.Rare, Occur.VeryRare ]),
+        new(12, "Schlinggras", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Sumpf und Moor"], [Occur.Rare ]),
+        new(3, "Schwarmschwamm", ["1 Schwamm", " und W2 Samenkörper" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche", "Flussauen"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(2, "Schwarzer Wein", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Hochland", "Steppe", "Wald"], [Occur.Modest, Occur.Modest, Occur.Common ]),
+        new(2, "Shurinstrauch", ["W20 Knollen" ], ["Praios", "Rondra", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Steppe", "Grasland, Wiesen", "Wald"], [Occur.Rare, Occur.Rare, Occur.VeryRare ]),
+        new(5, "Talaschin", ["W6 Flechten" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Gebirge", "Eis", "Wüste und Wüstenrand"], [Occur.Modest, Occur.Rare, Occur.VeryRare ]),
+        new(8, "Tarnblatt", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Regenwald", "Wald"], [Occur.Rare, Occur.Rare ]),
+        new(4, "Tarnele", ["1 Pflanze" ], ["Praios", "Rondra", "Efferd", "Travia", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Hochland", "Grasland, Wiesen", "Flussauen", "Sumpf und Moor", "Wald"], [Occur.VeryRare, Occur.Common, Occur.Common, Occur.Modest, Occur.Modest ]),
+        new(12, "Thonnys", ["W6+4 Blätter" ], ["Praios", "Rondra", "Efferd", "Travia", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Steppe", "Wald"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(6, "Traschbart", ["W6 Flechten" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Sumpf und Moor", "Wald"], [Occur.Modest, Occur.Common ]),
+        new(11, "Trichterwurzel", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wald", "Waldrand"], [Occur.Modest, Occur.VeryRare ]),
+        new(1, "Tuur-Amash-Kelch", ["W6+3 Kelche" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wald", "Waldrand"], [Occur.Rare, Occur.VeryRare ]),
+        new(2, "Ulmenwürger", ["W20 Blüten" ], ["Efferd", "Travia" ], ["Wald", "Waldrand"], [Occur.Modest, Occur.Rare ]),
+        new(5, "Vierblättrige Einbeere", ["W6 Beeren" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Eis", "Gebirge", "Hochland", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Küste, Strand", "Flussauen", "Sumpf und Moor", "Wald", "Waldrand"], [Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.Modest, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.Common, Occur.Common ]),
+        new(6, "Vragieswurzel", ["1 Wurzel" ], ["Efferd", "Travia" ], ["Gebirge", "Hochland", "Regenwald", "Wald"], [Occur.Rare, Occur.VeryRare, Occur.Modest, Occur.Rare ]),
+        new(9, "Waldwebe", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Wald"], [Occur.Modest ]),
+        new(1, "Wasserrausch", ["2W20 Blüten" ], ["Praios", "Rondra", "Efferd", "Travia", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche"], [Occur.Rare ]),
+        new(12, "Winselgras", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Steppe", "Grasland, Wiesen"], [Occur.Modest, Occur.Rare ]),
+        new(5, "Wirselkraut", ["W6+4 Blätter" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Steppe", "Grasland, Wiesen"], [Occur.Common, Occur.Modest ]),
+        new(5, "Würgedattel", ["Keine Angabe im ZBA" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Regenwald", "Waldrand"], [Occur.VeryRare, Occur.VeryRare ]),
+        new(6, "Yaganstrauch", ["W6 Nüsse" ], ["Boron" ], ["Hochland", "Wald"], [Occur.Rare, Occur.Modest ]),
+        new(5, "Zithabar", ["3W20 Blätter" ], ["Praios", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Fluss- und Seeufer, Teiche", "Sumpf und Moor", "Wald", "Waldrand"], [Occur.Common, Occur.Modest, Occur.VeryRare, Occur.Rare ]),
+        new(4, "Zunderschwamm", ["W6 Pilze" ], ["Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Regenwald", "Wald"], [Occur.Modest, Occur.Common ]),
+        new(5, "Zwölfblatt", ["12 Stängel" ], ["Praios", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" ], ["Hochland", "Steppe", "Grasland, Wiesen", "Sumpf und Moor", "Wald"], [Occur.VeryRare, Occur.Modest, Occur.Rare, Occur.VeryRare, Occur.Modest])
+    ];
+
+    #endregion hard coded data
+
+    public PlantSeeking()
     {
-        private readonly Random random = new();
-        public bool Coincidence { get; set; } = false;
-        public Plant CurrentPlant { get; set; } = Plants[0];
+        core = Core.GetInstance();
+    }
 
-        #region hard coded data
+    public override void SetSkill()
+    {
+        SetSkill(["Wildnisleben", "Sinnenschärfe", "Pflanzenkunde"]);
+    }
 
-        public static Plant[] Plants => new Plant[]
+    public override void Roll()
+    {
+        int pointsLeft;
+        int amount = 0;
+        int mod = 0;
+        int skillpoints = SkillPoints;
+        string textResult = string.Empty;
+        (int pointsResult, string stringResult) rolldata;
+
+        if (Duration >= MinDuration * 2)
         {
-            new(9, "Alraune", new string[]{ "1 Pflanze" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche", "Waldrand"}, new Occur[]{ Occur.Rare, Occur.Rare }),
-            new(-5, "Alveranie", new string[]{ "12 Blätter, jeweils in der Farbe des Monats" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja" }, new string[] { "Eis", "Wüste und Wüstenrand", "Gebirge", "Hochland", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor", "Regenwald", "Wald", "Waldrand"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare }),
-            new(4, "Arganstrauch", new string[]{ "1 Wurzel" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Sumpf und Moor", "Regenwald", "Wald"}, new Occur[]{ Occur.Rare, Occur.Modest, Occur.VeryRare }),
-            new(6, "Atan-Kiefer", new string[]{ "W20 Stein Rinde, bei komplettem Abschälen Verdreifachung des Wertes" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge"}, new Occur[]{ Occur.Rare }),
-            new(5, "Atmon", new string[]{ "W6 Büschel" }, new string[] { "Peraine" }, new string[] { "Hochland", "Steppe", "Flussauen", "Sumpf und Moor"}, new Occur[]{ Occur.Rare, Occur.Modest, Occur.VeryRare, Occur.VeryRare }),
-            new(4, "Axorda-Baum", new string[]{ "1 Baum" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge", "Regenwald"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(15, "Basilamine", new string[]{ "W20+10 Schoten" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wald", "Waldrand"}, new Occur[]{ Occur.Modest, Occur.Rare }),
-            new(6, "Belmart", new string[]{ "2W20 Blätter" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wald", "Waldrand"}, new Occur[]{ Occur.Modest, Occur.Rare }),
-            new(4, "Blutblatt", new string[]{ "W20+2 Zweige pro 10 AsP der Quelle" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Eis", "Wüste und Wüstenrand", "Gebirge", "Hochland", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Küste, Strand", "Flussauen", "Sumpf und Moor", "Regenwald", "Wald", "Waldrand"}, new Occur[]{ Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare, Occur.Rare }),
-            new(-2, "Boronie", new string[]{ "5 Blüten, die kurz vor dem Verblühen sind" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Grasland, Wiesen", "Regenwald"}, new Occur[]{ Occur.VeryRare, Occur.Rare }),
-            new(15, "Boronsschlinge", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Regenwald", "Wald"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(5, "Carlog", new string[]{ "W6 Blüten", " mit je 1 Stempel" }, new string[] { "Efferd", "Peraine" }, new string[] { "Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor"}, new Occur[]{ Occur.Rare, Occur.VeryRare, Occur.Modest }),
-            new(4, "Cheria-Kaktus", new string[]{ "W3 Stein Kaktusfleisch", " und pro Stein 3W6+8 Stacheln" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wüste und Wüstenrand"}, new Occur[]{ Occur.Rare }),
-            new(6, "Chonchinis", new string[]{ "W20 Blätter" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Hochland", "Steppe", "Waldrand"}, new Occur[]{ Occur.VeryRare, Occur.Modest, Occur.Rare }),
-            new(5, "Disdychonda", new string[]{ "4 Blätter" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Regenwald", "Wald"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(6, "Donf", new string[]{ "1 Stängel" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor"}, new Occur[]{ Occur.Rare, Occur.VeryRare, Occur.Modest }),
-            new(3, "Dornrose", new string[]{ "Strauch mit W6 Blüten" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Grasland, Wiesen", "Wald"}, new Occur[]{ Occur.Common, Occur.Modest }),
-            new(4, "Efeuer", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wald", "Höhle (feucht)", "Höhle (trocken)"}, new Occur[]{ Occur.Rare, Occur.Modest, Occur.Modest }),
-            new(6, "Egelschreck", new string[]{ "2W20 Blätter" }, new string[] { "Rondra", "Efferd" }, new string[] { "Grasland, Wiesen", "Flussauen", "Sumpf und Moor", "Waldrand"}, new Occur[]{ Occur.Modest, Occur.Modest, Occur.Common, Occur.Rare }),
-            new(2, "Eitriger Krötenschemel", new string[]{ "2W6 Pilzhäute" }, new string[] { "Efferd", "Travia", "Boron" }, new string[] { "Flussauen", "Sumpf und Moor", "Wald"}, new Occur[]{ Occur.Rare, Occur.Modest, Occur.VeryRare }),
-            new(15, "Feuermoos und Efferdmoos", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Höhle (feucht)"}, new Occur[]{ Occur.Modest }),
-            new(6, "Feuerschlick", new string[]{ "W6 Stein der Algen" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Küste, Strand", "Meer"}, new Occur[]{ Occur.Common, Occur.VeryRare }),
-            new(5, "Finage", new string[]{ "Baum mit W20 Trieben", " und Bast" }, new string[] { "Boron", "Hesinde", "Firun", "Peraine" }, new string[] { "Grasland, Wiesen", "Regenwald", "Wald"}, new Occur[]{ Occur.VeryRare, Occur.Rare, Occur.Rare }),
-            new(4, "Grüne Schleimschlange", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Flussauen", "Sumpf und Moor"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(6, "Gulmond", new string[]{ "2W6 Blätter" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Hochland", "Steppe", "Wald"}, new Occur[]{ Occur.Modest, Occur.Common, Occur.Modest }),
-            new(8, "Hiradwurz", new string[]{ "1 Wurzel" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Steppe"}, new Occur[]{ Occur.Rare }),
-            new(4, "Hollbeere", new string[]{ "2W6 Sträucher", " mit jeweils 2W6+5 Beeren", " und 2W6+3 Blätter der untersten Zweige" }, new string[] { "Rondra", "Efferd" }, new string[] { "Wald", "Waldrand"}, new Occur[]{ Occur.Modest, Occur.Common }),
-            new(8, "Höllenkraut", new string[]{ "W10 Stein der Ranken" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Regenwald", "Wald", "Waldrand"}, new Occur[]{ Occur.Common, Occur.Rare, Occur.VeryRare }),
-            new(7, "Horusche", new string[]{ "W6 erntereife Schoten", " mit je W3 Kernen" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wald"}, new Occur[]{ Occur.Rare }),
-            new(2, "Ilmenblatt", new string[]{ "W20 Blätter", " und W20 Blüten" }, new string[] { "Travia", "Ingerimm" }, new string[] { "Gebirge", "Grasland, Wiesen", "Wald"}, new Occur[]{ Occur.VeryRare, Occur.Modest, Occur.Modest }),
-            new(12, "Iribaarslilie", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Sumpf und Moor"}, new Occur[]{ Occur.VeryRare }),
-            new(15, "Jagdgras", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge", "Hochland", "Steppe", "Wald"}, new Occur[]{ Occur.Modest, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare }),
-            new(7, "Joruga", new string[]{ "1 Wurzel" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge", "Grasland, Wiesen", "Wald"}, new Occur[]{ Occur.VeryRare, Occur.Rare, Occur.Modest }),
-            new(6, "Kairan", new string[]{ "1 Halm" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche"}, new Occur[]{ Occur.Rare }),
-            new(4, "Kajubo", new string[]{ "2W6 Knospen (Nur die Hälfte um den Strauch zu schonen)" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Küste, Strand", "Waldrand"}, new Occur[]{ Occur.Rare, Occur.Rare }),
-            new(12, "Khôm- oder Mhanadiknolle", new string[]{ "1 Wurzel", " mit W6 Maß klarem Wasser" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wüste und Wüstenrand", "Steppe"}, new Occur[]{ Occur.VeryRare, Occur.Rare }),
-            new(8, "Klippenzahn", new string[]{ "2W6 Stängel" }, new string[] { "Praios", "Rondra", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge", "Hochland"}, new Occur[]{ Occur.Modest, Occur.Modest }),
-            new(10, "Kukuka", new string[]{ "1W3 x 20 Blätter" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Regenwald"}, new Occur[]{ Occur.Rare }),
-            new(9, "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", new string[]{ "2W6+1 Blüten" }, new string[] { "Praios", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche"}, new Occur[]{ Occur.Modest }),
-            new(7, "Purpurner Lotus", new string[]{ "W6+1 Blüten" }, new string[] { "Praios", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche"}, new Occur[]{ Occur.Rare }),
-            new(6, "Schwarzer Lotus", new string[]{ "W6 Blüten" }, new string[] { "Praios", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche"}, new Occur[]{ Occur.VeryRare }),
-            new(8, "Grauer Lotus", new string[]{ "W6+1 Blüten" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche", "Sumpf und Moor"}, new Occur[]{ Occur.Rare, Occur.VeryRare }),
-            new(10, "Weißer Lotus", new string[]{ "W6+1 Blüten" }, new string[] { "Praios", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche", "Sumpf und Moor"}, new Occur[]{ Occur.Rare, Occur.VeryRare }),
-            new(10, "Weißgelber Lotus", new string[]{ "W3 Blüten" }, new string[] { "Praios", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche"}, new Occur[]{ Occur.Modest }),
-            new(5, "Lulanie", new string[]{ "1 Blüte" }, new string[] { "Praios", "Rondra", "Rahja", "Namenlose Tage" }, new string[] { "Wald", "Waldrand"}, new Occur[]{ Occur.Rare, Occur.VeryRare }),
-            new(15, "Madablüte", new string[]{ "1 Blüte" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge", "Steppe"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(4, "Menchal-Kaktus", new string[]{ "1 Kaktus", " mit W3 Maß Menchalsaft; bei 1 auf W20 außerdem mit W6 Blüten" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wüste und Wüstenrand", "Hochland"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(2, "Merach-Strauch", new string[]{ "2W20 reife Früchte" }, new string[] { "Efferd", "Travia" }, new string[] { "Regenwald", "Wald"}, new Occur[]{ Occur.Rare, Occur.VeryRare }),
-            new(6, "Messergras", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wüste und Wüstenrand", "Hochland", "Steppe"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare, Occur.Rare }),
-            new(10, "Mibelrohr", new string[]{ "2W6 Kolben" }, new string[] { "Praios", "Rondra", "Efferd", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor"}, new Occur[]{ Occur.Modest, Occur.Rare, Occur.VeryRare }),
-            new(8, "Mirbelstein", new string[]{ "1 Wurzelknolle" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Hochland", "Grasland, Wiesen", "Wald"}, new Occur[]{ Occur.Rare, Occur.Modest, Occur.Common }),
-            new(4, "Mirhamer Seidenliane", new string[]{ "1 Ranke", " mit W2+1 Knoten" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge", "Fluss- und Seeufer, Teiche", "Regenwald"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare, Occur.Rare }),
-            new(5, "Bleichmohn (Weißer Mohn)", new string[]{ "W6 geschlossene Samenkapseln" }, new string[] { "Rondra" }, new string[] { "Gebirge"}, new Occur[]{ Occur.Rare }),
-            new(-5, "Bunter Mohn", new string[]{ "1 geschlossene Samenkapsel" }, new string[] { "Travia" }, new string[] { "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Waldrand"}, new Occur[]{ Occur.Common, Occur.Modest, Occur.Rare }),
-            new(1, "Grauer Mohn", new string[]{ "1 geschlossene Samenkapsel und 1 Blüte" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge"}, new Occur[]{ Occur.VeryRare }),
-            new(3, "Purpurmohn", new string[]{ "1 geschlossene Samenkapsel" }, new string[] { "Rahja" }, new string[] { "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Wald"}, new Occur[]{ Occur.Rare, Occur.VeryRare, Occur.VeryRare }),
-            new(5, "Schwarzer Mohn", new string[]{ "2 Blätter", " und 1 geschlossene Samenkapsel" }, new string[] { "Efferd", "Travia", "Boron" }, new string[] { "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"}, new Occur[]{ Occur.VeryCommon, Occur.VeryCommon, Occur.VeryCommon, Occur.VeryCommon, Occur.VeryCommon, Occur.VeryCommon }),
-            new(10, "Tigermohn", new string[]{ "1 geschlossene Samenkapsel" }, new string[] { "Travia" }, new string[] { "Grasland, Wiesen", "Flussauen", "Waldrand"}, new Occur[]{ Occur.Rare, Occur.Rare, Occur.Rare }),
-            new(13, "Morgendornstrauch", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Sumpf und Moor"}, new Occur[]{ Occur.Rare }),
-            new(1, "Naftanstaude", new string[]{ "1 Staude" }, new string[] { "Praios", "Rondra", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Steppe", "Grasland, Wiesen", "Waldrand"}, new Occur[]{ Occur.VeryRare, Occur.Rare, Occur.VeryRare }),
-            new(4, "Neckerkraut", new string[]{ "W20+5 Blätter" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Grasland, Wiesen", "Küste, Strand", "Sumpf und Moor"}, new Occur[]{ Occur.Rare, Occur.Modest, Occur.VeryRare }),
-            new(6, "Nothilf", new string[]{ "W20+2 Blüten", " und 2W20+10 Blätter" }, new string[] { "Praios", "Peraine" }, new string[] { "Gebirge", "Wald"}, new Occur[]{ Occur.Rare, Occur.Rare }),
-            new(10, "Olginwurz", new string[]{ "W3 Moosballen" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge", "Hochland", "Wald"}, new Occur[]{ Occur.Rare, Occur.Rare, Occur.Rare }),
-            new(4, "Orazal", new string[]{ "W6 verholzte Stängel" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Regenwald", "Wald"}, new Occur[]{ Occur.Rare, Occur.VeryRare }),
-            new(4, "Orklandbovist", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Hochland", "Steppe", "Wald"}, new Occur[]{ Occur.Rare, Occur.VeryRare, Occur.VeryRare }),
-            new(6, "Pestsporenpilz", new string[]{ "1 Pilzhaut" }, new string[] { "Efferd", "Travia", "Boron", "Peraine", "Ingerimm", "Rahja" }, new string[] { "Grasland, Wiesen", "Sumpf und Moor", "Wald"}, new Occur[]{ Occur.Rare, Occur.Rare, Occur.VeryRare }),
-            new(10, "Phosphorpilz", new string[]{ "W6 Stein Geflechtstücke" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Höhle (feucht)", "Höhle (trocken)"}, new Occur[]{ Occur.Modest, Occur.Rare }),
-            new(12, "Quasselwurz", new string[]{ "1 Wurzel" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wald"}, new Occur[]{ Occur.Rare }),
-            new(6, "Quinja", new string[]{ "W3+2 Beeren" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Regenwald", "Wald", "Waldrand"}, new Occur[]{ Occur.Common, Occur.Modest, Occur.Rare }),
-            new(5, "Rahjalieb", new string[]{ "2W6 Blätter" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Grasland, Wiesen", "Sumpf und Moor", "Regenwald", "Wald"}, new Occur[]{ Occur.Modest, Occur.Modest, Occur.Common, Occur.Modest }),
-            new(7, "Rattenpilz", new string[]{ "1 Pilz" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge", "Hochland", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Küste, Strand", "Flussauen", "Sumpf und Moor", "Regenwald", "Wald", "Waldrand"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare }),
-            new(3, "Rauschgurke", new string[]{ "3W6 reife Rauschgurken" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wald", "Waldrand"}, new Occur[]{ Occur.Modest, Occur.Rare }),
-            new(7, "Rote Pfeilblüte", new string[]{ "W6 Blüten" }, new string[] { "Peraine", "Ingerimm", "Rahja" }, new string[] { "Sumpf und Moor", "Regenwald", "Wald"}, new Occur[]{ Occur.Modest, Occur.Modest, Occur.VeryRare }),
-            new(10, "Roter Drachenschlund", new string[]{ "W6 Blätter" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche", "Waldrand"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(12, "Sansaro", new string[]{ "1 Pflanze" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Küste, Strand", "Meer"}, new Occur[]{ Occur.Common, Occur.Rare }),
-            new(-2, "Satuariensbusch", new string[]{ "4W20 Blätter,", " W20 Blüten,", " W20 Früchte,", " W3 Flux Saft" }, new string[] { "Praios", "Efferd", "Travia", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wald", "Waldrand"}, new Occur[]{ Occur.Modest, Occur.Modest }),
-            new(3, "Schlangenzünglein", new string[]{ "Saft einer Pflanze" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche", "Sumpf und Moor", "Regenwald"}, new Occur[]{ Occur.Rare, Occur.Rare, Occur.VeryRare }),
-            new(6, "Schleichender Tod", new string[]{ "W6 Blüten" }, new string[] { "Ingerimm", "Rahja" }, new string[] { "Fluss- und Seeufer, Teiche", "Waldrand"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(3, "Schleimiger Sumpfknöterich", new string[]{ "2W6 Pilze" }, new string[] { "Praios", "Rondra", "Efferd", "Travia" }, new string[] { "Wald", "Waldrand"}, new Occur[]{ Occur.Rare, Occur.VeryRare }),
-            new(12, "Schlinggras", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Sumpf und Moor"}, new Occur[]{ Occur.Rare }),
-            new(3, "Schwarmschwamm", new string[]{ "1 Schwamm", " und W2 Samenkörper" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche", "Flussauen"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(2, "Schwarzer Wein", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Hochland", "Steppe", "Wald"}, new Occur[]{ Occur.Modest, Occur.Modest, Occur.Common }),
-            new(2, "Shurinstrauch", new string[]{ "W20 Knollen" }, new string[] { "Praios", "Rondra", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Steppe", "Grasland, Wiesen", "Wald"}, new Occur[]{ Occur.Rare, Occur.Rare, Occur.VeryRare }),
-            new(5, "Talaschin", new string[]{ "W6 Flechten" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Gebirge", "Eis", "Wüste und Wüstenrand"}, new Occur[]{ Occur.Modest, Occur.Rare, Occur.VeryRare }),
-            new(8, "Tarnblatt", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Regenwald", "Wald"}, new Occur[]{ Occur.Rare, Occur.Rare }),
-            new(4, "Tarnele", new string[]{ "1 Pflanze" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Hochland", "Grasland, Wiesen", "Flussauen", "Sumpf und Moor", "Wald"}, new Occur[]{ Occur.VeryRare, Occur.Common, Occur.Common, Occur.Modest, Occur.Modest }),
-            new(12, "Thonnys", new string[]{ "W6+4 Blätter" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Steppe", "Wald"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(6, "Traschbart", new string[]{ "W6 Flechten" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Sumpf und Moor", "Wald"}, new Occur[]{ Occur.Modest, Occur.Common }),
-            new(11, "Trichterwurzel", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wald", "Waldrand"}, new Occur[]{ Occur.Modest, Occur.VeryRare }),
-            new(1, "Tuur-Amash-Kelch", new string[]{ "W6+3 Kelche" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wald", "Waldrand"}, new Occur[]{ Occur.Rare, Occur.VeryRare }),
-            new(2, "Ulmenwürger", new string[]{ "W20 Blüten" }, new string[] { "Efferd", "Travia" }, new string[] { "Wald", "Waldrand"}, new Occur[]{ Occur.Modest, Occur.Rare }),
-            new(5, "Vierblättrige Einbeere", new string[]{ "W6 Beeren" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Eis", "Gebirge", "Hochland", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Küste, Strand", "Flussauen", "Sumpf und Moor", "Wald", "Waldrand"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.Modest, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.VeryRare, Occur.Common, Occur.Common }),
-            new(6, "Vragieswurzel", new string[]{ "1 Wurzel" }, new string[] { "Efferd", "Travia" }, new string[] { "Gebirge", "Hochland", "Regenwald", "Wald"}, new Occur[]{ Occur.Rare, Occur.VeryRare, Occur.Modest, Occur.Rare }),
-            new(9, "Waldwebe", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Wald"}, new Occur[]{ Occur.Modest }),
-            new(1, "Wasserrausch", new string[]{ "2W20 Blüten" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche"}, new Occur[]{ Occur.Rare }),
-            new(12, "Winselgras", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Steppe", "Grasland, Wiesen"}, new Occur[]{ Occur.Modest, Occur.Rare }),
-            new(5, "Wirselkraut", new string[]{ "W6+4 Blätter" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Steppe", "Grasland, Wiesen"}, new Occur[]{ Occur.Common, Occur.Modest }),
-            new(5, "Würgedattel", new string[]{ "Keine Angabe im ZBA" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Regenwald", "Waldrand"}, new Occur[]{ Occur.VeryRare, Occur.VeryRare }),
-            new(6, "Yaganstrauch", new string[]{ "W6 Nüsse" }, new string[] { "Boron" }, new string[] { "Hochland", "Wald"}, new Occur[]{ Occur.Rare, Occur.Modest }),
-            new(5, "Zithabar", new string[]{ "3W20 Blätter" }, new string[] { "Praios", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Fluss- und Seeufer, Teiche", "Sumpf und Moor", "Wald", "Waldrand"}, new Occur[]{ Occur.Common, Occur.Modest, Occur.VeryRare, Occur.Rare }),
-            new(4, "Zunderschwamm", new string[]{ "W6 Pilze" }, new string[] { "Praios", "Rondra", "Efferd", "Travia", "Boron", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Regenwald", "Wald"}, new Occur[]{ Occur.Modest, Occur.Common }),
-            new(5, "Zwölfblatt", new string[]{ "12 Stängel" }, new string[] { "Praios", "Hesinde", "Firun", "Tsa", "Phex", "Peraine", "Ingerimm", "Rahja", "Namenlose Tage" }, new string[] { "Hochland", "Steppe", "Grasland, Wiesen", "Sumpf und Moor", "Wald"}, new Occur[]{ Occur.VeryRare, Occur.Modest, Occur.Rare, Occur.VeryRare, Occur.Modest })
-        };
-
-        #endregion hard coded data
-
-        public PlantSeeking(Core core)
-        {
-            this.core = core;
+            skillpoints = (int) (SkillPoints * 1.5);
         }
 
-        public override void SetSkill()
+        if (Coincidence)
         {
-            SetSkill(new string[] { "Wildnisleben", "Sinnenschärfe", "Pflanzenkunde" });
-        }
+            rolldata = Roll(core.Mu, core.In, core.Ge, mod, skillpoints);
+            pointsLeft = rolldata.pointsResult;
+            bool canFind = true;
+            List<Plant> plantsLootTable = [];
+            List<ResultData> results = [];
+            List<(string name, int difficulty)> plantDifficulties = [];
+            List<Plant> plantsToRemove = [];
 
-        public override void Roll()
-        {
-            int pointsLeft;
-            int amount = 0;
-            int mod = 0;
-            int skillpoints = SkillPoints;
-            string textResult = string.Empty;
-            (int pointsResult, string stringResult) rolldata;
-            if (Duration >= MinDuration * 2)
+            foreach (Plant plant in core.CurrentRegion.GetPossiblePlants(core.CurrentLandscape.Name, core.CurrentMonth))
             {
-                skillpoints = (int)(SkillPoints * 1.5);
-            }
-
-            if (Coincidence)
-            {
-                rolldata = Roll(core.MU, core.IN, core.GE, mod, skillpoints);
-                pointsLeft = rolldata.pointsResult;
-                bool canFind = true;
-                List<Plant> PlantsLootTable = new();
-                List<ResultData> Results = new();
-                List<(string name, int difficulty)> plantDifficulties = new();
-                List<Plant> plantsToRemove = new();
-                foreach (Plant plant in core.CurrentRegion.GetPossiblePlants(core.CurrentLandscape.Name, core.CurrentMonth))
+                int foundingDifficulty = GetFoundingDifficulty(plant);
+                if (foundingDifficulty <= pointsLeft / 2 && plant.Loot[0] != "Keine Angabe im ZBA")
                 {
-                    int foundingDifficulty = GetFoundingDifficulty(plant);
-                    if (foundingDifficulty <= pointsLeft / 2 && plant.Loot[0] != "Keine Angabe im ZBA")
-                    {
-                        PlantsLootTable.AddRange(GenerateLootTableEntry(plant));
-                        plantDifficulties.Add((plant.Name, foundingDifficulty));
-                    }
-                    else
-                    {
-                        plantsToRemove.Add(plant);
-                    }
-                }
-                if (plantsToRemove.Count > 0)
-                {
-                    foreach (Plant plant in plantsToRemove)
-                    {
-                        PlantsLootTable.RemoveAll(p => p.Name == plant.Name);
-                    }
-                    plantsToRemove.Clear();
-                }
-                if (PlantsLootTable.Count == 0)
-                {
-                    canFind = false;
-                }
-                while (canFind)
-                {
-                    if (plantDifficulties.Count > 0 && pointsLeft / 2 >= (from Tuple in plantDifficulties select Tuple.difficulty).ToArray().Min())
-                    {
-                        int index = PlantsLootTable.Count == 1 ? 0 : random.Next(PlantsLootTable.Count);
-                        (int[] quantityData, string[] quantityStrings) result = GenerateLootQuantity(PlantsLootTable[index].Loot);
-                        try
-                        {
-                            Results.Single(r => r.Name == PlantsLootTable[index].Name).IncreaseData(result.quantityData);
-                        }
-                        catch
-                        {
-                            ResultData resultData = new()
-                            {
-                                Name = PlantsLootTable[index].Name,
-                                quantity = result
-                            };
-                            Results.Add(resultData);
-                        }
-                        pointsLeft -= plantDifficulties.Single(p => p.name == PlantsLootTable[index].Name).difficulty;
-                        foreach (Plant plant in PlantsLootTable)
-                        {
-                            if (GetFoundingDifficulty(plant) > pointsLeft / 2 && !plantsToRemove.Contains(plant))
-                            {
-                                plantsToRemove.Add(plant);
-                            }
-                        }
-                        foreach (Plant plant in plantsToRemove)
-                        {
-                            PlantsLootTable.RemoveAll(p => p.Name == plant.Name);
-                            plantDifficulties.Remove(plantDifficulties.SingleOrDefault(t => t.name == plant.Name));
-                        }
-                        plantsToRemove.Clear();
-                    }
-                    else
-                    {
-                        canFind = false;
-                        for (int i = 0; i < Results.Count; i++)
-                        {
-                            textResult += Results[i].Name + ":\n";
-                            for (int n = 0; n < Results[i].quantity.quantityData.Length; n++)
-                            {
-                                textResult += Results[i].quantity.quantityData[n] + Results[i].quantity.quantityStrings[n].TrimEnd(',') + "\n";
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                int[] quantityTotal = Array.Empty<int>();
-                string[] quantityStrings = Array.Empty<string>();
-                mod = GetFoundingDifficulty(CurrentPlant);
-                rolldata = Roll(core.MU, core.IN, core.GE, mod, skillpoints);
-                pointsLeft = rolldata.pointsResult;
-                if (pointsLeft >= 0)
-                {
-                    do
-                    {
-                        amount++;
-                        pointsLeft -= mod / 2;
-                    }
-                    while (pointsLeft >= 0);
-                    for (int i = 0; i < amount; i++)
-                    {
-                        (int[] quantityData, string[] quantityStrings) result = GenerateLootQuantity(CurrentPlant.Loot);
-                        if (quantityTotal.Length == 0)
-                        {
-                            quantityTotal = new int[result.quantityData.Length];
-                            quantityStrings = result.quantityStrings;
-                        }
-                        for (int j = 0; j < quantityTotal.Length; j++)
-                        {
-                            quantityTotal[j] += result.quantityData[j];
-                        }
-                    }
-                    for (int i = 0; i < quantityTotal.Length; i++)
-                    {
-                        textResult += quantityTotal[i] + quantityStrings[i].TrimEnd(',') + "\n";
-                    }
-                }
-            }
-            LastResult = new Result(rolldata.pointsResult.ToString(), rolldata.stringResult, textResult);
-        }
-
-        public Plant GetPlantByName(string plantName)
-        {
-            return Plants.Single(p => p.Name == plantName);
-        }
-
-        public int GetOccurrenceMod(Plant plant)
-        {
-            return (int)plant.OccurData.SingleOrDefault(o => o.Landscape == core.CurrentLandscape.Name).Mod;
-        }
-
-        public int GetFoundingDifficulty(Plant plant)
-        {
-            return plant.IdentificationMod + GetOccurrenceMod(plant);
-        }
-
-        private (int[] quantityData, string[] quantityStrings) GenerateLootQuantity(string[] loot)
-        {
-            Regex variableQuantityRegex = new("((\\s|[0-9]+)?W[0-9]+(\\+[0-9]+)?)");
-            Regex fixedQuantityRegex = new("\\s?[0-9][0-9]?");
-            Regex unitRegex = new("[0-9]+(\\s\\w{3,})(?!\\s[0-9])");
-            List<int> quantityData = new();
-            List<string> quantityStrings = new();
-            foreach (string l in loot)
-            {
-                if (variableQuantityRegex.IsMatch(l))
-                {
-                    int[] quantityDatas = new int[3];
-                    Match match = variableQuantityRegex.Match(l);
-                    string unit = unitRegex.Match(l).Groups[1].Value;
-                    string[] s = match.Value.Split(new char[] { 'W', '+', });
-                    for (int i = 0; i < s.Length; i++)
-                    {
-                        quantityDatas[i] = string.IsNullOrWhiteSpace(s[i]) ? 1 : int.Parse(s[i]);
-                    }
-                    int rollData = DSA.Roll(quantityDatas[0], quantityDatas[1]).Sum();
-                    quantityData.Add(rollData + quantityDatas[2]);
-                    quantityStrings.Add(unit);
+                    plantsLootTable.AddRange(GenerateLootTableEntry(plant));
+                    plantDifficulties.Add((plant.Name, foundingDifficulty));
                 }
                 else
                 {
-                    Match match = fixedQuantityRegex.Match(l);
-                    string unit = unitRegex.Match(l).Groups[1].Value;
-                    quantityData.Add(int.Parse(match.Value));
-                    quantityStrings.Add(unit);
+                    plantsToRemove.Add(plant);
                 }
             }
-            return (quantityData.ToArray(), quantityStrings.ToArray());
+
+            if (plantsToRemove.Count > 0)
+            {
+                foreach (Plant plant in plantsToRemove)
+                {
+                    plantsLootTable.RemoveAll(p => p.Name == plant.Name);
+                }
+                plantsToRemove.Clear();
+            }
+
+            if (plantsLootTable.Count == 0)
+            {
+                canFind = false;
+            }
+
+            while (canFind)
+            {
+                if (plantDifficulties.Count > 0 && pointsLeft / 2 >= (from Tuple in plantDifficulties select Tuple.difficulty).ToArray().Min())
+                {
+                    int index = plantsLootTable.Count == 1 ? 0 : _random.Next(plantsLootTable.Count);
+                    (int[] quantityData, string[] quantityStrings) result = GenerateLootQuantity(plantsLootTable[index].Loot);
+
+                    try
+                    {
+                        results.Single(r => r.Name == plantsLootTable[index].Name).IncreaseData(result.quantityData);
+                    }
+                    catch
+                    {
+                        ResultData resultData = new()
+                        {
+                            Name = plantsLootTable[index].Name,
+                            Quantity = result
+                        };
+                        results.Add(resultData);
+                    }
+
+                    pointsLeft -= plantDifficulties.Single(p => p.name == plantsLootTable[index].Name).difficulty;
+
+                    foreach (Plant plant in plantsLootTable.Where(plant => GetFoundingDifficulty(plant) > pointsLeft / 2 && !plantsToRemove.Contains(plant)))
+                    {
+                        plantsToRemove.Add(plant);
+                    }
+
+                    foreach (Plant plant in plantsToRemove)
+                    {
+                        plantsLootTable.RemoveAll(p => p.Name == plant.Name);
+                        plantDifficulties.Remove(plantDifficulties.SingleOrDefault(t => t.name == plant.Name));
+                    }
+                    plantsToRemove.Clear();
+                }
+                else
+                {
+                    canFind = false;
+
+                    for (int i = 0; i < results.Count; i++)
+                    {
+                        textResult += results[i].Name + ":\n";
+
+                        for (int n = 0; n < results[i].Quantity.quantityData.Length; n++)
+                        {
+                            textResult += results[i].Quantity.quantityData[n] + results[i].Quantity.quantityStrings[n].TrimEnd(',') + "\n";
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            int[] quantityTotal = [];
+            string[] quantityStrings = [];
+            mod = GetFoundingDifficulty(CurrentPlant);
+            rolldata = Roll(core.Mu, core.In, core.Ge, mod, skillpoints);
+            pointsLeft = rolldata.pointsResult;
+
+            if (pointsLeft >= 0)
+            {
+                do
+                {
+                    amount++;
+                    pointsLeft -= mod / 2;
+                }
+                while (pointsLeft >= 0);
+
+                for (int i = 0; i < amount; i++)
+                {
+                    (int[] quantityData, string[] quantityStrings) result = GenerateLootQuantity(CurrentPlant.Loot);
+
+                    if (quantityTotal.Length == 0)
+                    {
+                        quantityTotal = new int[result.quantityData.Length];
+                        quantityStrings = result.quantityStrings;
+                    }
+
+                    for (int j = 0; j < quantityTotal.Length; j++)
+                    {
+                        quantityTotal[j] += result.quantityData[j];
+                    }
+                }
+
+                for (int i = 0; i < quantityTotal.Length; i++)
+                {
+                    textResult += quantityTotal[i] + quantityStrings[i].TrimEnd(',') + "\n";
+                }
+            }
+        }
+        LastResult = new(rolldata.pointsResult.ToString(), rolldata.stringResult, textResult);
+    }
+
+    public Plant GetPlantByName(string plantName)
+    {
+        return Plants.Single(p => p.Name == plantName);
+    }
+
+    public int GetOccurrenceMod(Plant plant)
+    {
+        return (int) plant.OccurData.SingleOrDefault(o => o.Landscape == core.CurrentLandscape.Name).Mod!;
+    }
+
+    public int GetFoundingDifficulty(Plant plant)
+    {
+        return plant.IdentificationMod + GetOccurrenceMod(plant);
+    }
+
+    private (int[] quantityData, string[] quantityStrings) GenerateLootQuantity(string[] loot)
+    {
+        Regex variableQuantityRegex = new(@"((\s|[0-9]+)?W[0-9]+(\+[0-9]+)?)");
+        Regex fixedQuantityRegex = new("\\s?[0-9][0-9]?");
+        Regex unitRegex = new(@"[0-9]+(\s\w{3,})(?!\s[0-9])");
+        List<int> quantityData = [];
+        List<string> quantityStrings = [];
+
+        foreach (string l in loot)
+        {
+            if (variableQuantityRegex.IsMatch(l))
+            {
+                int[] quantityDatas = new int[3];
+                Match match = variableQuantityRegex.Match(l);
+                string unit = unitRegex.Match(l).Groups[1].Value;
+                string[] s = match.Value.Split(['W', '+',]);
+
+                for (int i = 0; i < s.Length; i++)
+                {
+                    quantityDatas[i] = string.IsNullOrWhiteSpace(s[i]) ? 1 : int.Parse(s[i]);
+                }
+
+                int rollData = DSA.Roll(quantityDatas[0], quantityDatas[1]).Sum();
+                quantityData.Add(rollData + quantityDatas[2]);
+                quantityStrings.Add(unit);
+            }
+            else
+            {
+                Match match = fixedQuantityRegex.Match(l);
+                string unit = unitRegex.Match(l).Groups[1].Value;
+                quantityData.Add(int.Parse(match.Value));
+                quantityStrings.Add(unit);
+            }
         }
 
-        private Plant[] GenerateLootTableEntry(Plant plant)
+        return (quantityData.ToArray(), quantityStrings.ToArray());
+    }
+
+    private Plant[] GenerateLootTableEntry(Plant plant)
+    {
+        int amount = GetOccurrenceMod(plant) switch
         {
-            int amount = GetOccurrenceMod(plant) switch
-            {
-                1 => 5,
-                2 => 4,
-                4 => 3,
-                8 => 2,
-                16 => 1,
-                _ => 0,
-            };
-            Plant[] entry = new Plant[amount];
-            for (int i = 0; i < amount; i++)
-            {
-                entry[i] = plant;
-            }
-            return entry;
+            1 => 5,
+            2 => 4,
+            4 => 3,
+            8 => 2,
+            16 => 1,
+            _ => 0,
+        };
+
+        Plant[] entry = new Plant[amount];
+
+        for (int i = 0; i < amount; i++)
+        {
+            entry[i] = plant;
         }
+
+        return entry;
     }
 }

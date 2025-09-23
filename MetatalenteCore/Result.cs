@@ -1,16 +1,8 @@
-﻿namespace Metatalente.Core
-{
-    public struct Result
-    {
-        public string PointsLeft { get; }
-        public string DiceResult { get; }
-        public string TextResult { get; }
+namespace Metatalente.Core;
 
-        public Result(string pointsLeft, string diceResult, string textResult)
-        {
-            PointsLeft = pointsLeft ?? throw new ArgumentNullException(nameof(pointsLeft));
-            DiceResult = diceResult ?? throw new ArgumentNullException(nameof(diceResult));
-            TextResult = textResult ?? throw new ArgumentNullException(nameof(textResult));
-        }
-    }
+public readonly record struct Result(string PointsLeft, string DiceResult, string TextResult)
+{
+    public string PointsLeft { get; } = PointsLeft ?? throw new ArgumentNullException(nameof(PointsLeft));
+    public string DiceResult { get; } = DiceResult ?? throw new ArgumentNullException(nameof(DiceResult));
+    public string TextResult { get; } = TextResult ?? throw new ArgumentNullException(nameof(TextResult));
 }

@@ -1,0 +1,97 @@
+﻿<Project Sdk="Uno.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net9.0-desktop</TargetFrameworks>
+
+    <OutputType>Exe</OutputType>
+    <UnoSingleProject>true</UnoSingleProject>
+
+    <!-- Display name -->
+    <ApplicationTitle>DSAMetatalente</ApplicationTitle>
+    <!-- App Identifier -->
+    <ApplicationId>com.Jungbluth.DSAMetatalente</ApplicationId>
+    <!-- Versions -->
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+    <!-- Package Publisher -->
+    <ApplicationPublisher>Jungbluth</ApplicationPublisher>
+    <!-- Package Description -->
+    <Description>DSAMetatalente powered by Uno Platform.</Description>
+
+    <!--
+      UnoFeatures let's you quickly add and manage implicit package references based on the features you want to use.
+      https://aka.platform.uno/singleproject-features
+    -->
+    <UnoFeatures>
+      Lottie;
+      Toolkit;
+      Mvvm;
+      ThemeService;
+      SkiaRenderer;
+    </UnoFeatures>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <AssemblyName>Metatalente</AssemblyName>
+    <DefaultLanguage>de</DefaultLanguage>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Uno.CommunityToolkit.WinUI.UI" />
+    <PackageReference Include="UnoGroupBox" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MetatalenteCore\MetatalenteCore.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="DSAUtils">
+      <HintPath>..\DSAUtils.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="DSAMetatalente" />
+    <Using Include="DSAMetatalente.Controls" />
+    <Using Include="DSAMetatalente.Models" />
+    <Using Include="DSAMetatalente.ViewModels" />
+    <Using Include="DSAMetatalente.Views" />
+    <Using Include="Metatalente.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\SkillControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\ResultControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\TabForaging.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\TabPlantSeeking.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\TabHunting.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\BlankPage1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\LoadFromToolDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\AboutDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+</Project>

@@ -1,48 +1,33 @@
-﻿namespace Metatalente.Core
+namespace Metatalente.Core;
+
+public readonly record struct Region(Occur Foraging, Occur Wildlife, string Name, string[] Landscapes, string[] Animals, string[] Plants)
 {
-    public readonly struct Region
+    public int? ForagingMod { get; } = Foraging == 0 ? null : (int)Foraging;
+    public int? WildlifeMod { get; } = Wildlife == 0 ? null : (int)Wildlife;
+    public string ForagingString { get; } = Core.OccurToString((int)Foraging);
+    public string WildlifeString { get; } = Core.OccurToString((int)Wildlife);
+    public string Name { get; } = Name ?? throw new ArgumentNullException(nameof(Name));
+    public string[] Landscapes { get; } = Landscapes ?? throw new ArgumentNullException(nameof(Landscapes));
+    public string[] Animals { get; } = Animals ?? throw new ArgumentNullException(nameof(Animals));
+    public string[] Plants { get; } = Plants ?? throw new ArgumentNullException(nameof(Plants));
+
+    public Plant[] GetPossiblePlants(string landscape, string month)
     {
-        public int? ForagingMod { get; }
-        public int? WildlifeMod { get; }
-        public string ForagingString { get; }
-        public string WildlifeString { get; }
-        public string Name { get; }
-        public string[] Landscapes { get; }
-        public string[] Animals { get; }
-        public string[] Plants { get; }
+        List<Plant> plantsLandscape = [];
 
-        public Region(Occur foraging, Occur wildlife, string name, string[] landscapes, string[] animals, string[] plants)
+        foreach (string plant in Plants)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Landscapes = landscapes ?? throw new ArgumentNullException(nameof(landscapes));
-            Animals = animals ?? throw new ArgumentNullException(nameof(animals));
-            Plants = plants ?? throw new ArgumentNullException(nameof(plants));
-            ForagingMod = foraging == 0 ? null : (int)foraging;
-            WildlifeMod = wildlife == 0 ? null : (int)wildlife;
-            ForagingString = Core.OccurToString((int)foraging);
-            WildlifeString = Core.OccurToString((int)wildlife);
+            Plant plantEntry = PlantSeeking.Plants.SingleOrDefault(p => p.Name == plant && p.OccurData.SingleOrDefault(o => o.Landscape == landscape).Landscape == landscape);
+
+            if (plantEntry.Name != null)
+            {
+                plantsLandscape.Add(plantEntry);
+            }
         }
 
-        public Plant[] GetPossiblePlants(string landscape, string month)
-        {
-            List<Plant> plantsLandscape = new();
-            foreach (string plant in Plants)
-            {
-                Plant plantEntry = PlantSeeking.Plants.SingleOrDefault(p => p.Name == plant && p.OccurData.SingleOrDefault(o => o.Landscape == landscape).Landscape == landscape);
-                if (plantEntry.Name != null)
-                {
-                    plantsLandscape.Add(plantEntry);
-                }
-            }
-            List<Plant> plantsData = new();
-            foreach (Plant plant in plantsLandscape)
-            {
-                if (plant.Months.Contains(month))
-                {
-                    plantsData.Add(plant);
-                }
-            }
-            return plantsData.ToArray();
-        }
+        List<Plant> plantsData = [];
+        plantsData.AddRange(plantsLandscape.Where(plant => plant.Months.Contains(month)));
+
+        return [.. plantsData];
     }
 }
