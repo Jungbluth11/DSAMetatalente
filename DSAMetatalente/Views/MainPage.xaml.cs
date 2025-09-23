@@ -1,16 +1,59 @@
 namespace DSAMetatalente.Views;
 
-public sealed partial class MainPage : Page
+public sealed partial class MainPage : Page, IRecipient<Charakter>
 {
     private readonly ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
 
     public MainPage()
     {
         InitializeComponent();
+        WeakReferenceMessenger.Default.Register(this);
     }
 
-    private void MenuAbout_OnClick(object sender, RoutedEventArgs e)
+    private void MainPage_OnLoaded(object sender, RoutedEventArgs e)
     {
+        switch ((string) _localSettings.Values["theme"])
+        {
+            case "Light":
+                (XamlRoot!.Content as FrameworkElement)!.RequestedTheme = ElementTheme.Light;
+                MenuThemeLight.IsChecked = true;
+
+                break;
+            case "Dark":
+                (XamlRoot!.Content as FrameworkElement)!.RequestedTheme = ElementTheme.Dark;
+                MenuThemeDark.IsChecked = true;
+
+                break;
+            default:
+                (XamlRoot!.Content as FrameworkElement)!.RequestedTheme = ElementTheme.Default;
+                MenuThemeSystem.IsChecked = true;
+
+                break;
+        }
+    }
+
+    private async void MenuAbout_OnClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            AboutDialog dialog = new()
+            {
+                XamlRoot = XamlRoot
+            };
+
+            await dialog.ShowAsync();
+        }
+        catch (Exception ex)
+        {
+            ContentDialog dialog = new()
+            {
+                Content = ex.Message,
+                XamlRoot = XamlRoot,
+                CloseButtonText = "OK"
+            };
+
+            await dialog.ShowAsync();
+        }
     }
 
     private async void MenuCharacterLoadFromFile_OnClick(object sender, RoutedEventArgs e)
@@ -19,7 +62,7 @@ public sealed partial class MainPage : Page
         {
             FileOpenPicker fileOpenPicker = new()
             {
-                FileTypeFilter = {".xml"},
+                FileTypeFilter = { ".xml" },
                 CommitButtonText = "Auswählen"
             };
 
@@ -56,7 +99,7 @@ public sealed partial class MainPage : Page
     {
         try
         {
-            ContentDialog dialog = new LoadFromToolDialog
+            LoadFromToolDialog dialog = new()
             {
                 XamlRoot = XamlRoot
             };
@@ -94,28 +137,6 @@ public sealed partial class MainPage : Page
         _localSettings.Values["theme"] = nameof(ElementTheme.Default);
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
-    {
-        switch ((string) _localSettings.Values["theme"])
-        {
-            case "Light":
-                (XamlRoot!.Content as FrameworkElement)!.RequestedTheme = ElementTheme.Light;
-                MenuThemeLight.IsChecked = true;
-
-                break;
-            case "Dark":
-                (XamlRoot!.Content as FrameworkElement)!.RequestedTheme = ElementTheme.Dark;
-                MenuThemeDark.IsChecked = true;
-
-                break;
-            default:
-                (XamlRoot!.Content as FrameworkElement)!.RequestedTheme = ElementTheme.Default;
-                MenuThemeSystem.IsChecked = true;
-
-                break;
-        }
-    }
-
     private void TabView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (TabView.SelectedIndex == 2)
@@ -136,5 +157,10 @@ public sealed partial class MainPage : Page
             SkillSinnenschaerfe.Visibility = Visibility.Visible;
             SkillPflanzenkunde.Visibility = Visibility.Visible;
         }
+    }
+
+    public void Receive(Charakter character)
+    {
+        ApplicationView.GetForCurrentView().Title = $"Metatalente - {character.Name}";
     }
 }

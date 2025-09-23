@@ -30,6 +30,8 @@
     </UnoFeatures>
     <AssemblyVersion>2.0.0.0</AssemblyVersion>
     <FileVersion>2.0.0.0</FileVersion>
+    <AssemblyName>Metatalente</AssemblyName>
+    <DefaultLanguage>de</DefaultLanguage>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Uno.CommunityToolkit.WinUI.UI" />
@@ -83,6 +85,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\LoadFromToolDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\AboutDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

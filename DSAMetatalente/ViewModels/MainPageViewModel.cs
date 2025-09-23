@@ -25,9 +25,9 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
     [ObservableProperty] private string _descriptionForaging = string.Empty;
     [ObservableProperty] private string _descriptionKnownTerrain = string.Empty;
     [ObservableProperty] private string _descriptionWildlife = string.Empty;
-    public bool CanLoadFromTool => Core.IsHeldenToolInstalled;
-    public Core Core { get; } = Core.GetInstance();
-    public ObservableCollection<string> KnownTerrains { get; private set; } = [];
+    public bool CanLoadFromTool => _core.IsHeldenToolInstalled;
+    private readonly Core _core = Core.GetInstance();
+    public ObservableCollection<string> KnownTerrains { get; } = [];
     public ObservableCollection<string> Landscapes { get; } = [];
     public string[] Month => Core.Months;
     public IEnumerable<string> Regions => from Region in Core.Regions select Region.Name;
@@ -35,13 +35,13 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
     public MainPageViewModel()
     {
         WeakReferenceMessenger.Default.Register(this);
-        CurrentMonth = Core.CurrentMonth;
-        CurrentRegion = Core.CurrentRegion.Name;
-        CurrentLandscape = Core.CurrentLandscape.Name;
-        Ff = Core.Ff;
-        Ge = Core.Ge;
-        In = Core.In;
-        Mu = Core.Mu;
+        CurrentMonth = _core.CurrentMonth;
+        CurrentRegion = _core.CurrentRegion.Name;
+        CurrentLandscape = _core.CurrentLandscape.Name;
+        Ff = _core.Ff;
+        Ge = _core.Ge;
+        In = _core.In;
+        Mu = _core.Mu;
 
         if (CheckForUpdates())
         {
@@ -49,15 +49,15 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
         }
     }
 
-    public void Receive(Charakter message)
+    public void Receive(Charakter character)
     {
-        Core.LoadCharacter(message);
+        _core.LoadCharacter(character);
         LoadCharacter();
     }
 
     public void LoadCharacterFromFile(string filePath)
     {
-        Core.LoadCharacterFromFile(filePath);
+        _core.LoadCharacterFromFile(filePath);
         LoadCharacter();
     }
 
@@ -93,18 +93,20 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
 
     private void LoadCharacter()
     {
-        Mu = Core.Mu;
-        In = Core.In;
-        Ge = Core.Ge;
-        Ff = Core.Ff;
-        SkillSinnenschaerfe = Core.SkillSinnenschaerfe;
-        SkillSichVerstecken = Core.SkillSichVerstecken;
-        SkillTierkunde = Core.SkillTierkunde;
-        SkillWildnisleben = Core.SkillWildnisleben;
-        SkillPflanzenkunde = Core.SkillPflanzenkunde;
-        SkillSchleichen = Core.SkillSchleichen;
-        KnownTerrains = [.. Core.KnownTerrains];
-        IsKnownTerrain = Core.IsKnownTerrain;
+        Mu = _core.Mu;
+        In = _core.In;
+        Ge = _core.Ge;
+        Ff = _core.Ff;
+        SkillSinnenschaerfe = _core.SkillSinnenschaerfe;
+        SkillSichVerstecken = _core.SkillSichVerstecken;
+        SkillTierkunde = _core.SkillTierkunde;
+        SkillWildnisleben = _core.SkillWildnisleben;
+        SkillPflanzenkunde = _core.SkillPflanzenkunde;
+        SkillSchleichen = _core.SkillSchleichen;
+        SkillFaehrtensuchen = _core.SkillFaehrtensuchen;
+        KnownTerrains.Clear();
+        KnownTerrains.AddRange([.. _core.KnownTerrains]);
+        IsKnownTerrain = _core.IsKnownTerrain;
     }
 
     [RelayCommand]
@@ -130,57 +132,57 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
 
     partial void OnMuChanged(int value)
     {
-        Core.Mu = value;
+        _core.Mu = value;
     }
 
     partial void OnInChanged(int value)
     {
-        Core.In = value;
+        _core.In = value;
     }
 
     partial void OnGeChanged(int value)
     {
-        Core.Ge = value;
+        _core.Ge = value;
     }
 
     partial void OnFfChanged(int value)
     {
-        Core.Ff = value;
+        _core.Ff = value;
     }
 
     partial void OnSkillWildnislebenChanged(int value)
     {
-        Core.SkillWildnisleben = value;
+        _core.SkillWildnisleben = value;
     }
 
     partial void OnSkillSinnenschaerfeChanged(int value)
     {
-        Core.SkillSinnenschaerfe = value;
+        _core.SkillSinnenschaerfe = value;
     }
 
     partial void OnSkillPflanzenkundeChanged(int value)
     {
-        Core.SkillPflanzenkunde = value;
+        _core.SkillPflanzenkunde = value;
     }
 
     partial void OnSkillTierkundeChanged(int value)
     {
-        Core.SkillTierkunde = value;
+        _core.SkillTierkunde = value;
     }
 
     partial void OnSkillFaehrtensuchenChanged(int value)
     {
-        Core.SkillFaehrtensuchen = value;
+        _core.SkillFaehrtensuchen = value;
     }
 
     partial void OnSkillSchleichenChanged(int value)
     {
-        Core.SkillSchleichen = value;
+        _core.SkillSchleichen = value;
     }
 
     partial void OnSkillSichVersteckenChanged(int value)
     {
-        Core.SkillSichVerstecken = value;
+        _core.SkillSichVerstecken = value;
     }
 
     #endregion character
@@ -189,16 +191,16 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
 
     partial void OnCurrentMonthChanged(string value)
     {
-        Core.CurrentMonth = value;
+        _core.CurrentMonth = value;
     }
 
     partial void OnCurrentRegionChanged(string value)
     {
-        Core.CurrentRegion = Core.GetRegion(value);
-        DescriptionForaging = Core.CurrentRegion.ForagingString;
-        DescriptionWildlife = Core.CurrentRegion.WildlifeString;
+        _core.CurrentRegion = Core.GetRegion(value);
+        DescriptionForaging = _core.CurrentRegion.ForagingString;
+        DescriptionWildlife = _core.CurrentRegion.WildlifeString;
         Landscapes.Clear();
-        Landscapes.AddRange([.. Core.CurrentRegion.Landscapes]);
+        Landscapes.AddRange([.. _core.CurrentRegion.Landscapes]);
 
         if (!Landscapes.Contains(CurrentLandscape))
         {
@@ -213,13 +215,13 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
             return;
         }
 
-        Core.CurrentLandscape = Core.GetLandscape(value);
-        string? terrain = Core.CurrentLandscape.Terrain;
+        _core.CurrentLandscape = Core.GetLandscape(value);
+        string? terrain = _core.CurrentLandscape.Terrain;
         DescriptionKnownTerrain = terrain ?? string.Empty;
 
-        IsKnownTerrain = Core.KnownTerrains.Length switch
+        IsKnownTerrain = _core.KnownTerrains.Length switch
         {
-            > 0 when terrain != null && Core.KnownTerrains.Contains(terrain) => true,
+            > 0 when terrain != null && _core.KnownTerrains.Contains(terrain) => true,
             > 0 => false,
             _ => IsKnownTerrain
         };
@@ -227,7 +229,7 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
 
     partial void OnIsKnownTerrainChanged(bool value)
     {
-        Core.IsKnownTerrain = value;
+        _core.IsKnownTerrain = value;
     }
 
     #endregion environment

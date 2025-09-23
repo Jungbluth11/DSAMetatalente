@@ -139,7 +139,7 @@ public class PlantSeeking : MetatalentBase
 
         if (Duration >= MinDuration * 2)
         {
-            skillpoints = (int)(SkillPoints * 1.5);
+            skillpoints = (int) (SkillPoints * 1.5);
         }
 
         if (Coincidence)
@@ -203,12 +203,9 @@ public class PlantSeeking : MetatalentBase
 
                     pointsLeft -= plantDifficulties.Single(p => p.name == plantsLootTable[index].Name).difficulty;
 
-                    foreach (Plant plant in plantsLootTable)
+                    foreach (Plant plant in plantsLootTable.Where(plant => GetFoundingDifficulty(plant) > pointsLeft / 2 && !plantsToRemove.Contains(plant)))
                     {
-                        if (GetFoundingDifficulty(plant) > pointsLeft / 2 && !plantsToRemove.Contains(plant))
-                        {
-                            plantsToRemove.Add(plant);
-                        }
+                        plantsToRemove.Add(plant);
                     }
 
                     foreach (Plant plant in plantsToRemove)
@@ -283,7 +280,7 @@ public class PlantSeeking : MetatalentBase
 
     public int GetOccurrenceMod(Plant plant)
     {
-        return (int)plant.OccurData.SingleOrDefault(o => o.Landscape == core.CurrentLandscape.Name).Mod!;
+        return (int) plant.OccurData.SingleOrDefault(o => o.Landscape == core.CurrentLandscape.Name).Mod!;
     }
 
     public int GetFoundingDifficulty(Plant plant)

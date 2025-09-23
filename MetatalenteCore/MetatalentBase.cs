@@ -30,6 +30,11 @@ public abstract class MetatalentBase
                 try
                 {
                     Ability ability = core.Character.Talente.Single(a => a.Name == baseSkill);
+
+                    if (!IsSet)
+                    {
+                        IsSet = true;
+                    }
                 }
                 catch
                 {

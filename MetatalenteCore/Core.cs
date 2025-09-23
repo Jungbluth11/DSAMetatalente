@@ -383,7 +383,7 @@ public class Core : INotifyPropertyChanged
                 case "Schleichen":
                     SkillSchleichen = ability.Wert;
                     break;
-                case "Sich Verstecken":
+                case "Sich verstecken":
                     SkillSichVerstecken = ability.Wert;
                     break;
             }
