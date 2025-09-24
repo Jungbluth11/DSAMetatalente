@@ -21,8 +21,6 @@ public sealed partial class SkillControl : UserControl
     public static readonly DependencyProperty ValueProperty =
         DependencyProperty.Register(nameof(Value), typeof(int), typeof(SkillControl), new(0, OnValueChanged));
 
-    public event TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>? ValueChanged;
-
     public SkillControl()
     {
         InitializeComponent();
@@ -42,12 +40,6 @@ public sealed partial class SkillControl : UserControl
 
     private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
     {
-        try
-        {
-            ValueChanged!.Invoke(sender, args);
-        }
-        catch
-        {
-        }
+        Value = (int) args.NewValue;
     }
 }

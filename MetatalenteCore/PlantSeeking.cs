@@ -120,10 +120,10 @@ public class PlantSeeking : MetatalentBase
 
     public PlantSeeking()
     {
-        core = Core.GetInstance();
+        SetSkill();
     }
 
-    public override void SetSkill()
+    public sealed override void SetSkill()
     {
         SetSkill(["Wildnisleben", "Sinnenschärfe", "Pflanzenkunde"]);
     }
@@ -144,7 +144,7 @@ public class PlantSeeking : MetatalentBase
 
         if (Coincidence)
         {
-            rolldata = Roll(core.Mu, core.In, core.Ge, mod, skillpoints);
+            rolldata = Roll(_core.Mu, _core.In, _core.Ge, mod, skillpoints);
             pointsLeft = rolldata.pointsResult;
             bool canFind = true;
             List<Plant> plantsLootTable = [];
@@ -152,7 +152,7 @@ public class PlantSeeking : MetatalentBase
             List<(string name, int difficulty)> plantDifficulties = [];
             List<Plant> plantsToRemove = [];
 
-            foreach (Plant plant in core.CurrentRegion.GetPossiblePlants(core.CurrentLandscape.Name, core.CurrentMonth))
+            foreach (Plant plant in _core.CurrentRegion.GetPossiblePlants(_core.CurrentLandscape.Name, _core.CurrentMonth))
             {
                 int foundingDifficulty = GetFoundingDifficulty(plant);
                 if (foundingDifficulty <= pointsLeft / 2 && plant.Loot[0] != "Keine Angabe im ZBA")
@@ -236,7 +236,7 @@ public class PlantSeeking : MetatalentBase
             int[] quantityTotal = [];
             string[] quantityStrings = [];
             mod = GetFoundingDifficulty(CurrentPlant);
-            rolldata = Roll(core.Mu, core.In, core.Ge, mod, skillpoints);
+            rolldata = Roll(_core.Mu, _core.In, _core.Ge, mod, skillpoints);
             pointsLeft = rolldata.pointsResult;
 
             if (pointsLeft >= 0)
@@ -280,7 +280,7 @@ public class PlantSeeking : MetatalentBase
 
     public int GetOccurrenceMod(Plant plant)
     {
-        return (int) plant.OccurData.SingleOrDefault(o => o.Landscape == core.CurrentLandscape.Name).Mod!;
+        return (int) plant.OccurData.SingleOrDefault(o => o.Landscape == _core.CurrentLandscape.Name).Mod!;
     }
 
     public int GetFoundingDifficulty(Plant plant)
