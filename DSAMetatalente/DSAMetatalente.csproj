@@ -28,10 +28,11 @@
       ThemeService;
       SkiaRenderer;
     </UnoFeatures>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
+    <AssemblyVersion>2.0.1.0</AssemblyVersion>
+    <FileVersion>2.0.1.0</FileVersion>
     <AssemblyName>Metatalente</AssemblyName>
     <DefaultLanguage>de</DefaultLanguage>
+    <Version>2.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Uno.CommunityToolkit.WinUI.UI" />
