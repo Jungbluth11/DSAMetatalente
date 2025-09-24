@@ -1,3 +1,5 @@
+// Ignore Spelling: Scharfschuetze Meisterschuetze
+
 using System.Text.RegularExpressions;
 using System.Xml;
 using DSAUtils.HeldentoolInterop;
@@ -14,6 +16,7 @@ public class Hunting : MetatalentBase
         {
             _variant = value;
             MinDuration = _variant == Variants.Pirschjagd ? 60 : 90;
+            SetSkill();
         }
     }
     public bool IsScharfschuetze { get; set; }
@@ -146,26 +149,26 @@ public class Hunting : MetatalentBase
 
     public Hunting()
     {
-        core = Core.GetInstance();
+        SetSkill();
     }
 
-    public override void SetSkill()
+    public sealed override void SetSkill()
     {
         string skill = Variant == Variants.Pirschjagd ? "Schleichen" : "Sich Verstecken";
 
         SetSkill(["Wildnisleben", "Tierkunde", "Fährtensuchen", skill, UsedWeapon.UsedSkill]);
 
-        if (core.Character == null)
+        if (_core.Character == null)
         {
             return;
         }
 
-        if (core.Character.Sonderfertigkeiten.Contains("Scharfschütze"))
+        if (_core.Character.Sonderfertigkeiten.Contains("Scharfschütze"))
         {
             IsScharfschuetze = true;
         }
 
-        if (core.Character.Sonderfertigkeiten.Contains("Meisterschütze"))
+        if (_core.Character.Sonderfertigkeiten.Contains("Meisterschütze"))
         {
             IsMeisterschuetze = true;
         }
@@ -179,18 +182,18 @@ public class Hunting : MetatalentBase
         string diceResult = string.Empty;
         string textResult = string.Empty;
 
-        if (core.CurrentRegion.WildlifeMod is null)
+        if (_core.CurrentRegion.WildlifeMod is null)
         {
             return;
         }
 
         if (Coincidence)
         {
-            mod += 7 + (int)core.CurrentRegion.WildlifeMod;
+            mod += 7 + (int) _core.CurrentRegion.WildlifeMod;
         }
         else
         {
-            mod += CurrentAnimal.Difficulty + (int)core.CurrentRegion.WildlifeMod;
+            mod += CurrentAnimal.Difficulty + (int) _core.CurrentRegion.WildlifeMod;
         }
 
         lowRangeMod = UsedWeapon.MaxRange switch
@@ -286,7 +289,7 @@ public class Hunting : MetatalentBase
 
     public void LoadWeaponFromCharacter()
     {
-        if (core.Character == null)
+        if (_core.Character == null)
         {
             return;
         }
@@ -294,14 +297,14 @@ public class Hunting : MetatalentBase
         try
         {
             XmlDocument xml = new();
-            xml.LoadXml(core.Character.XML);
+            xml.LoadXml(_core.Character.XML);
             string number = xml.SelectSingleNode("//heldenausruestung[@name='jagtwaffe']")!.Attributes!["nummer"]!.Value;
             XmlNode weapon = xml.SelectSingleNode("//heldenausruestung[@name='fkwaffe" + number + "']")!;
-            Ability weaponAbility = core.Character.Talente.Single(a => a.Name == weapon.Attributes!["talent"]!.Value);
+            Ability weaponAbility = _core.Character.Talente.Single(a => a.Name == weapon.Attributes!["talent"]!.Value);
             UsedWeapon = GetWeaponByName(weapon.Attributes!["waffenname"]!.Value);
-            core.SkillWeapon = weaponAbility.Wert;
-            IsScharfschuetze = core.Character.Sonderfertigkeiten.Contains("Scharfschütze (" + weaponAbility.Name + ")");
-            IsMeisterschuetze = core.Character.Sonderfertigkeiten.Contains("Meisterschütze (" + weaponAbility.Name + ")");
+            _core.SkillWeapon = weaponAbility.Wert;
+            IsScharfschuetze = _core.Character.Sonderfertigkeiten.Contains("Scharfschütze (" + weaponAbility.Name + ")");
+            IsMeisterschuetze = _core.Character.Sonderfertigkeiten.Contains("Meisterschütze (" + weaponAbility.Name + ")");
         }
         catch
         {
@@ -313,7 +316,7 @@ public class Hunting : MetatalentBase
     {
         string[] resultStrings = new string[2];
         string count = string.Empty;
-        (int pointsResult, string stringResult) = Roll(core.Mu, core.In, core.Ge, mod);
+        (int pointsResult, string stringResult) = Roll(_core.Mu, _core.In, _core.Ge, mod);
 
         if (multiple)
         {

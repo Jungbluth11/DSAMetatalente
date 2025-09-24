@@ -4,10 +4,10 @@ public class Foraging : MetatalentBase
 {
     public Foraging()
     {
-        core = Core.GetInstance();
+        SetSkill();
     }
 
-    public override void SetSkill()
+    public sealed override void SetSkill()
     {
         SetSkill(["Wildnisleben", "Sinnenschärfe", "Pflanzenkunde"]);
     }
@@ -16,12 +16,12 @@ public class Foraging : MetatalentBase
     {
         int amount = 0;
 
-        if (core.CurrentRegion.ForagingMod is null)
+        if (_core.CurrentRegion.ForagingMod is null)
         {
             return;
         }
 
-        int mod = (int)core.CurrentRegion.ForagingMod;
+        int mod = (int) _core.CurrentRegion.ForagingMod;
         int durationMod = (Duration - 60) / 15;
 
         if (durationMod > SkillPoints / 2)
@@ -30,7 +30,7 @@ public class Foraging : MetatalentBase
         }
 
         mod -= durationMod;
-        (int pointsLeft, string stringResult) = Roll(core.Mu, core.In, core.Ge, mod);
+        (int pointsLeft, string stringResult) = Roll(_core.Mu, _core.In, _core.Ge, mod);
 
         if (pointsLeft > 0)
         {

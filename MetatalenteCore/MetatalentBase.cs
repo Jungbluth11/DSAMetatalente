@@ -1,17 +1,31 @@
+// Ignore Spelling: Metatalent
+
 using DSAUtils.HeldentoolInterop;
 
 namespace Metatalente.Core;
 
 public abstract class MetatalentBase
 {
-#pragma warning disable CS8618 // is set in child classes
-    protected Core core;
-#pragma warning restore CS8618
+    private string[] _baseSkills = [];
+    protected Core _core = Core.GetInstance();
     public int Duration { get; set; } = 60;
     public int MinDuration { get; protected set; } = 60;
     public int SkillPoints { get; set; }
     public bool IsSet { get; protected set; } = true;
     public Result LastResult { get; protected set; }
+
+    protected MetatalentBase()
+    {
+        _core.PropertyChanged += Core_OnPropertyChanged;
+    }
+
+    private void Core_OnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (_baseSkills.Contains(e.PropertyName))
+        {
+            SetSkill(_baseSkills);
+        }
+    }
 
     public abstract void SetSkill();
 
@@ -19,17 +33,18 @@ public abstract class MetatalentBase
 
     protected void SetSkill(string[] baseSkills)
     {
+        _baseSkills = baseSkills;
         List<int> skillValues = [];
         int lowest = 0;
         int sum = 0;
 
         foreach (string baseSkill in baseSkills)
         {
-            if (core.Character != null)
+            if (_core.Character != null)
             {
                 try
                 {
-                    Ability ability = core.Character.Talente.Single(a => a.Name == baseSkill);
+                    Ability ability = _core.Character.Talente.Single(a => a.Name == baseSkill);
 
                     if (!IsSet)
                     {
@@ -46,28 +61,28 @@ public abstract class MetatalentBase
             switch (baseSkill)
             {
                 case "Wildnisleben":
-                    skillValues.Add(core.SkillWildnisleben);
+                    skillValues.Add(_core.SkillWildnisleben);
                     break;
                 case "Sinnenschärfe":
-                    skillValues.Add(core.SkillSinnenschaerfe);
+                    skillValues.Add(_core.SkillSinnenschaerfe);
                     break;
                 case "Pflanzenkunde":
-                    skillValues.Add(core.SkillPflanzenkunde);
+                    skillValues.Add(_core.SkillPflanzenkunde);
                     break;
                 case "Tierkunde":
-                    skillValues.Add(core.SkillTierkunde);
+                    skillValues.Add(_core.SkillTierkunde);
                     break;
                 case "Fährtensuchen":
-                    skillValues.Add(core.SkillFaehrtensuchen);
+                    skillValues.Add(_core.SkillFaehrtensuchen);
                     break;
                 case "Schleichen":
-                    skillValues.Add(core.SkillSchleichen);
+                    skillValues.Add(_core.SkillSchleichen);
                     break;
                 case "Sich Verstecken":
-                    skillValues.Add(core.SkillSichVerstecken);
+                    skillValues.Add(_core.SkillSichVerstecken);
                     break;
                 default:
-                    skillValues.Add(core.SkillWeapon);
+                    skillValues.Add(_core.SkillWeapon);
                     break;
             }
         }
@@ -108,7 +123,7 @@ public abstract class MetatalentBase
             skillPoints = SkillPoints;
         }
 
-        if (core.IsKnownTerrain)
+        if (_core.IsKnownTerrain)
         {
             mod -= 3;
         }
