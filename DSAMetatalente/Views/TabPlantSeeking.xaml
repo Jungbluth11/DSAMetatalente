@@ -60,7 +60,7 @@
             Margin="10"
             VerticalAlignment="Center"
             Content="Zufall"
-            IsChecked="{Binding Coincidence}"
+            IsChecked="{Binding Coincidence, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             IsEnabled="{Binding CanRoll}" />
         <ComboBox
             Grid.Row="1"

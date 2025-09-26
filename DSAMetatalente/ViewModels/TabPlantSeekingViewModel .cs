@@ -1,15 +1,13 @@
-using System.ComponentModel;
-
 namespace DSAMetatalente.ViewModels;
 
 public partial class TabPlantSeekingViewModel : ObservableObject
 {
+    private readonly Core _core = Core.GetInstance();
+    private readonly PlantSeeking _plantSeeking = new();
     [ObservableProperty] private bool _canRoll = true;
     [ObservableProperty] private bool _coincidence;
-    private readonly Core _core = Core.GetInstance();
     [ObservableProperty] private int _duration;
     [ObservableProperty] private int _minDuration;
-    private readonly PlantSeeking _plantSeeking = new();
     [ObservableProperty] private string _currentPlant;
     [ObservableProperty] private string _diceResult = string.Empty;
     [ObservableProperty] private string _identificationMod = string.Empty;
@@ -27,20 +25,6 @@ public partial class TabPlantSeekingViewModel : ObservableObject
         MinDuration = _plantSeeking.MinDuration;
     }
 
-    private void CheckCanRoll()
-    {
-        _plantSeeking.SetSkill();
-
-        if (Plants.Count > 0 && _plantSeeking.IsSet)
-        {
-            CanRoll = true;
-        }
-        else
-        {
-            CanRoll = false;
-        }
-    }
-
     private void Core_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
@@ -56,6 +40,25 @@ public partial class TabPlantSeekingViewModel : ObservableObject
 
                 break;
         }
+    }
+
+    private void CheckCanRoll()
+    {
+        _plantSeeking.SetSkill();
+
+        if (Plants.Count > 0 && _plantSeeking.IsSet)
+        {
+            CanRoll = true;
+        }
+        else
+        {
+            CanRoll = false;
+        }
+    }
+
+    partial void OnCoincidenceChanged(bool value)
+    {
+        _plantSeeking.Coincidence = value;
     }
 
     partial void OnCurrentPlantChanged(string value)

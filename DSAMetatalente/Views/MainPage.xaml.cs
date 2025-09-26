@@ -10,6 +10,11 @@ public sealed partial class MainPage : Page, IRecipient<Charakter>
         WeakReferenceMessenger.Default.Register(this);
     }
 
+    public void Receive(Charakter character)
+    {
+        ApplicationView.GetForCurrentView().Title = $"Metatalente - {character.Name}";
+    }
+
     private void MainPage_OnLoaded(object sender, RoutedEventArgs e)
     {
         switch ((string) _localSettings.Values["theme"])
@@ -62,7 +67,7 @@ public sealed partial class MainPage : Page, IRecipient<Charakter>
         {
             FileOpenPicker fileOpenPicker = new()
             {
-                FileTypeFilter = { ".xml" },
+                FileTypeFilter = {".xml"},
                 CommitButtonText = "Auswählen"
             };
 
@@ -157,10 +162,5 @@ public sealed partial class MainPage : Page, IRecipient<Charakter>
             SkillSinnenschaerfe.Visibility = Visibility.Visible;
             SkillPflanzenkunde.Visibility = Visibility.Visible;
         }
-    }
-
-    public void Receive(Charakter character)
-    {
-        ApplicationView.GetForCurrentView().Title = $"Metatalente - {character.Name}";
     }
 }

@@ -4,20 +4,20 @@ public sealed partial class ResultControl : UserControl
 {
     public string DiceResult
     {
-        get { return (string) GetValue(DiceResultProperty); }
-        set { SetValue(DiceResultProperty, value); }
+        get => (string) GetValue(DiceResultProperty);
+        set => SetValue(DiceResultProperty, value);
     }
 
     public string PointsResult
     {
-        get { return (string) GetValue(PointsResultProperty); }
-        set { SetValue(PointsResultProperty, value); }
+        get => (string) GetValue(PointsResultProperty);
+        set => SetValue(PointsResultProperty, value);
     }
 
     public string TextResult
     {
-        get { return (string) GetValue(TextResultProperty); }
-        set { SetValue(TextResultProperty, value); }
+        get => (string) GetValue(TextResultProperty);
+        set => SetValue(TextResultProperty, value);
     }
 
     public static readonly DependencyProperty DiceResultProperty =

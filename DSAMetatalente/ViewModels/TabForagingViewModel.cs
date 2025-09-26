@@ -1,12 +1,10 @@
-using System.ComponentModel;
-
 namespace DSAMetatalente.ViewModels;
 
 public partial class TabForagingViewModel : ObservableObject
 {
-    [ObservableProperty] private bool _canRoll = true;
     private readonly Core _core = Core.GetInstance();
     private readonly Foraging _foraging = new();
+    [ObservableProperty] private bool _canRoll = true;
     [ObservableProperty] private int _duration;
     [ObservableProperty] private int _minDuration;
     [ObservableProperty] private string _diceResult = string.Empty;
@@ -20,19 +18,19 @@ public partial class TabForagingViewModel : ObservableObject
         MinDuration = _foraging.MinDuration;
     }
 
-    private void CheckCanRoll()
-    {
-        _foraging.SetSkill();
-
-        CanRoll = _core.CurrentRegion.ForagingMod != null && _foraging.IsSet;
-    }
-
     private void Core_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is "CurrentRegion" or "CurrentLandscape" or "LoadCharacter")
         {
             CheckCanRoll();
         }
+    }
+
+    private void CheckCanRoll()
+    {
+        _foraging.SetSkill();
+
+        CanRoll = _core.CurrentRegion.ForagingMod != null && _foraging.IsSet;
     }
 
     partial void OnDurationChanged(int value)

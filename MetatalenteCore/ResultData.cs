@@ -1,5 +1,6 @@
 namespace Metatalente.Core;
 
+[DebuggerDisplay("name = {Name}, quantity = {Quantity}")]
 public struct ResultData
 {
     public string Name { get; set; }

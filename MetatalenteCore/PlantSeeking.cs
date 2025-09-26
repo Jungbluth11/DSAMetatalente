@@ -147,7 +147,7 @@ public class PlantSeeking : MetatalentBase
             rolldata = Roll(_core.Mu, _core.In, _core.Ge, mod, skillpoints);
             pointsLeft = rolldata.pointsResult;
             bool canFind = true;
-            List<Plant> plantsLootTable = [];
+            List<(string name, int occurence)> plantsOccurence = [];
             List<ResultData> results = [];
             List<(string name, int difficulty)> plantDifficulties = [];
             List<Plant> plantsToRemove = [];
@@ -157,7 +157,7 @@ public class PlantSeeking : MetatalentBase
                 int foundingDifficulty = GetFoundingDifficulty(plant);
                 if (foundingDifficulty <= pointsLeft / 2 && plant.Loot[0] != "Keine Angabe im ZBA")
                 {
-                    plantsLootTable.AddRange(GenerateLootTableEntry(plant));
+                    plantsOccurence.Add((plant.Name, GetOccurrenceMod(plant)));
                     plantDifficulties.Add((plant.Name, foundingDifficulty));
                 }
                 else
@@ -168,49 +168,43 @@ public class PlantSeeking : MetatalentBase
 
             if (plantsToRemove.Count > 0)
             {
-                foreach (Plant plant in plantsToRemove)
-                {
-                    plantsLootTable.RemoveAll(p => p.Name == plant.Name);
-                }
+                plantsOccurence.RemoveAll(p => p.occurence > pointsLeft);
                 plantsToRemove.Clear();
             }
 
-            if (plantsLootTable.Count == 0)
+            if (plantsOccurence.Count == 0)
             {
                 canFind = false;
             }
 
             while (canFind)
             {
-                if (plantDifficulties.Count > 0 && pointsLeft / 2 >= (from Tuple in plantDifficulties select Tuple.difficulty).ToArray().Min())
+                if (plantDifficulties.Count > 0 && pointsLeft / 2 >= (from Tuple in plantDifficulties select Tuple.difficulty).ToArray().Max())
                 {
-                    int index = plantsLootTable.Count == 1 ? 0 : _random.Next(plantsLootTable.Count);
-                    (int[] quantityData, string[] quantityStrings) result = GenerateLootQuantity(plantsLootTable[index].Loot);
+                    Plant randomPlant = GetRandomPlant(plantsOccurence);
+                    (int[] quantityData, string[] quantityStrings) result = GenerateLootQuantity(randomPlant.Loot);
 
                     try
                     {
-                        results.Single(r => r.Name == plantsLootTable[index].Name).IncreaseData(result.quantityData);
+                        results.Single(r => r.Name == randomPlant.Name).IncreaseData(result.quantityData);
                     }
                     catch
                     {
                         ResultData resultData = new()
                         {
-                            Name = plantsLootTable[index].Name,
+                            Name = randomPlant.Name,
                             Quantity = result
                         };
                         results.Add(resultData);
                     }
 
-                    pointsLeft -= plantDifficulties.Single(p => p.name == plantsLootTable[index].Name).difficulty;
+                    pointsLeft -= plantDifficulties.Single(p => p.name == randomPlant.Name).difficulty;
 
-                    foreach (Plant plant in plantsLootTable.Where(plant => GetFoundingDifficulty(plant) > pointsLeft / 2 && !plantsToRemove.Contains(plant)))
-                    {
-                        plantsToRemove.Add(plant);
-                    }
+                    plantsToRemove.AddRange(from plant in plantDifficulties where plant.difficulty > pointsLeft / 2 select GetPlantByName(plant.name));
 
                     foreach (Plant plant in plantsToRemove)
                     {
-                        plantsLootTable.RemoveAll(p => p.Name == plant.Name);
+                        plantsOccurence.Remove(plantsOccurence.SingleOrDefault(p => p.name == plant.Name));
                         plantDifficulties.Remove(plantDifficulties.SingleOrDefault(t => t.name == plant.Name));
                     }
                     plantsToRemove.Clear();
@@ -326,25 +320,13 @@ public class PlantSeeking : MetatalentBase
         return (quantityData.ToArray(), quantityStrings.ToArray());
     }
 
-    private Plant[] GenerateLootTableEntry(Plant plant)
+    private Plant GetRandomPlant(List<(string name, int occurence)> plantList)
     {
-        int amount = GetOccurrenceMod(plant) switch
-        {
-            1 => 5,
-            2 => 4,
-            4 => 3,
-            8 => 2,
-            16 => 1,
-            _ => 0,
-        };
+        int roll = DSA.Roll(1, 20)[0];
+        int[] occurences = [.. from Tuple in plantList select Tuple.occurence];
+        string[] plants = [.. from Tuple in plantList where Tuple.occurence == occurences.OrderBy(o => Math.Abs(o - roll)).First() select Tuple.name];
+        int index = _random.Next(plants.Length);
 
-        Plant[] entry = new Plant[amount];
-
-        for (int i = 0; i < amount; i++)
-        {
-            entry[i] = plant;
-        }
-
-        return entry;
+        return GetPlantByName(plants[index]);
     }
 }

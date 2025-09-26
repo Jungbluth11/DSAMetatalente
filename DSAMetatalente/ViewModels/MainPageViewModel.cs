@@ -6,6 +6,7 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
 {
     private const string UpdateLinkBase = "https://api.jungbluthcloud.de/updates/dsametatalente/";
     private const string VersionLink = "https://api.jungbluthcloud.de/updates/dsametatalente/version";
+    private readonly Core _core = Core.GetInstance();
     [ObservableProperty] private bool _isKnownTerrain;
     [ObservableProperty] private bool _isUpdateAvailable;
     [ObservableProperty] private int _ff;
@@ -26,7 +27,6 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
     [ObservableProperty] private string _descriptionKnownTerrain = string.Empty;
     [ObservableProperty] private string _descriptionWildlife = string.Empty;
     public bool CanLoadFromTool => _core.IsHeldenToolInstalled;
-    private readonly Core _core = Core.GetInstance();
     public ObservableCollection<string> KnownTerrains { get; } = [];
     public ObservableCollection<string> Landscapes { get; } = [];
     public string[] Month => Core.Months;
@@ -47,6 +47,20 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
         {
             IsUpdateAvailable = true;
         }
+#if DEBUG
+        Ff = 20;
+        Ge = 20;
+        In = 20;
+        Mu = 20;
+        SkillFaehrtensuchen = 20;
+        SkillPflanzenkunde = 20;
+        SkillSchleichen = 20;
+        SkillSichVerstecken = 20;
+        SkillSinnenschaerfe = 20;
+        SkillTierkunde = 20;
+        SkillWildnisleben = 20;
+        CurrentRegion = "Mittelländische Wälder (Gemäßigtes Klima)";
+#endif
     }
 
     public void Receive(Charakter character)
