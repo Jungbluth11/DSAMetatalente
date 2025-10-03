@@ -35,6 +35,7 @@
             Grid.Column="1"
             Margin="10"
             IsEnabled="{Binding CanRoll}"
+            KeyDown="UIElement_OnKeyDown"
             Minimum="{Binding MinDuration}"
             SpinButtonPlacementMode="Compact"
             Value="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />

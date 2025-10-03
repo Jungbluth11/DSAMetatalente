@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace Metatalente.Core;
 
 public class PlantSeeking : MetatalentBase
@@ -118,15 +116,9 @@ public class PlantSeeking : MetatalentBase
 
     #endregion hard coded data
 
-    public PlantSeeking()
-    {
-        SetSkill();
-    }
+    public PlantSeeking() => SetSkill();
 
-    public sealed override void SetSkill()
-    {
-        SetSkill(["Wildnisleben", "Sinnenschärfe", "Pflanzenkunde"]);
-    }
+    public sealed override void SetSkill() => SetSkill(["Wildnisleben", "Sinnenschärfe", "Pflanzenkunde"]);
 
     public override void Roll()
     {

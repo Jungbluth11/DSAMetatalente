@@ -1,8 +1,7 @@
 namespace DSAMetatalente.Views;
-
-public sealed partial class TabForaging : TabViewItem
+public sealed partial class TabFishing : TabViewItem
 {
-    public TabForaging()
+    public TabFishing()
     {
         InitializeComponent();
     }

@@ -1,25 +1,15 @@
-// Ignore Spelling: Metatalent
-
-using DSAUtils.HeldentoolInterop;
-
 namespace Metatalente.Core;
 
-public abstract class MetatalentBase
+public abstract class MetatalentBase : TalentBase
 {
     private string[] _baseSkills = [];
-    protected Core _core = Core.GetInstance();
-    public int Duration { get; set; } = 60;
-    public int MinDuration { get; protected set; } = 60;
-    public int SkillPoints { get; set; }
-    public bool IsSet { get; protected set; } = true;
-    public Result LastResult { get; protected set; }
 
     protected MetatalentBase()
     {
         _core.PropertyChanged += Core_OnPropertyChanged;
     }
 
-    private void Core_OnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void Core_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (_baseSkills.Contains(e.PropertyName))
         {
@@ -28,8 +18,6 @@ public abstract class MetatalentBase
     }
 
     public abstract void SetSkill();
-
-    public abstract void Roll();
 
     protected void SetSkill(string[] baseSkills)
     {
@@ -44,17 +32,18 @@ public abstract class MetatalentBase
             {
                 try
                 {
+                    // ReSharper disable once UnusedVariable --- Just to check if the skill exists
                     Ability ability = _core.Character.Talente.Single(a => a.Name == baseSkill);
-
-                    if (!IsSet)
-                    {
-                        IsSet = true;
-                    }
                 }
                 catch
                 {
                     IsSet = false;
                     return;
+                }
+
+                if (!IsSet)
+                {
+                    IsSet = true;
                 }
             }
 
@@ -104,38 +93,5 @@ public abstract class MetatalentBase
         {
             SkillPoints = sum / skillValues.Count;
         }
-    }
-
-    protected (int, string) Roll(int attribute1, int attribute2, int attribute3, int mod, int skillPoints = 0)
-    {
-        if (!IsSet)
-        {
-            throw new("The loaded Character has not this Skill. Can't roll");
-        }
-
-        if (Duration < MinDuration)
-        {
-            throw new("Duration can't be less than MinDuration");
-        }
-
-        if (skillPoints == 0)
-        {
-            skillPoints = SkillPoints;
-        }
-
-        if (_core.IsKnownTerrain)
-        {
-            mod -= 3;
-        }
-
-        (int punkteUeber, int[] wuerfelergebnisse, string text) = DSA.TaP(attribute1, attribute2, attribute3, skillPoints, mod);
-        string textdata = wuerfelergebnisse[0].ToString() + "/" + wuerfelergebnisse[1].ToString() + "/" + wuerfelergebnisse[2].ToString();
-
-        if (!string.IsNullOrEmpty(text))
-        {
-            textdata += " (" + text + ")";
-        }
-
-        return (punkteUeber, textdata);
     }
 }

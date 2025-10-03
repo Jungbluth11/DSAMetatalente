@@ -7,13 +7,18 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
     private const string UpdateLinkBase = "https://api.jungbluthcloud.de/updates/dsametatalente/";
     private const string VersionLink = "https://api.jungbluthcloud.de/updates/dsametatalente/version";
     private readonly Core _core = Core.GetInstance();
-    [ObservableProperty] private bool _isKnownTerrain;
+    [ObservableProperty] private bool _isTerrainKnowledge;
+    [ObservableProperty] private bool _isLocalKnowledge;
     [ObservableProperty] private bool _isUpdateAvailable;
     [ObservableProperty] private int _ff;
     [ObservableProperty] private int _ge;
     [ObservableProperty] private int _in;
+    [ObservableProperty] private int _kk;
+    [ObservableProperty] private int _kl;
     [ObservableProperty] private int _mu;
     [ObservableProperty] private int _skillFaehrtensuchen;
+    [ObservableProperty] private int _skillFallenstellen;
+    [ObservableProperty] private int _skillFischenAngeln;
     [ObservableProperty] private int _skillPflanzenkunde;
     [ObservableProperty] private int _skillSchleichen;
     [ObservableProperty] private int _skillSichVerstecken;
@@ -24,10 +29,11 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
     [ObservableProperty] private string _currentMonth;
     [ObservableProperty] private string _currentRegion;
     [ObservableProperty] private string _descriptionForaging = string.Empty;
-    [ObservableProperty] private string _descriptionKnownTerrain = string.Empty;
+    [ObservableProperty] private string _descriptionTerrainKnowledge = string.Empty;
     [ObservableProperty] private string _descriptionWildlife = string.Empty;
+    [ObservableProperty] private string _loadedCharacter = string.Empty;
     public bool CanLoadFromTool => _core.IsHeldenToolInstalled;
-    public ObservableCollection<string> KnownTerrains { get; } = [];
+    public ObservableCollection<string> TerrainKnowledges { get; } = [];
     public ObservableCollection<string> Landscapes { get; } = [];
     public string[] Month => Core.Months;
     public IEnumerable<string> Regions => from Region in Core.Regions select Region.Name;
@@ -41,16 +47,21 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
         Ff = _core.Ff;
         Ge = _core.Ge;
         In = _core.In;
+        Kk = _core.Kk;
+        Kl = _core.Kl;
         Mu = _core.Mu;
 
         if (CheckForUpdates())
         {
             IsUpdateAvailable = true;
         }
+
 #if DEBUG
         Ff = 20;
         Ge = 20;
         In = 20;
+        Kk = 20;
+        Kl = 20;
         Mu = 20;
         SkillFaehrtensuchen = 20;
         SkillPflanzenkunde = 20;
@@ -59,6 +70,8 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
         SkillSinnenschaerfe = 20;
         SkillTierkunde = 20;
         SkillWildnisleben = 20;
+        SkillFallenstellen = 20;
+        SkillFischenAngeln = 20;
         CurrentRegion = "Mittelländische Wälder (Gemäßigtes Klima)";
 #endif
     }
@@ -118,9 +131,10 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
         SkillPflanzenkunde = _core.SkillPflanzenkunde;
         SkillSchleichen = _core.SkillSchleichen;
         SkillFaehrtensuchen = _core.SkillFaehrtensuchen;
-        KnownTerrains.Clear();
-        KnownTerrains.AddRange([.. _core.KnownTerrains]);
-        IsKnownTerrain = _core.IsKnownTerrain;
+        TerrainKnowledges.Clear();
+        TerrainKnowledges.AddRange([.. _core.TerrainKnowledges]);
+        IsTerrainKnowledge = _core.IsTerrainKnowledge;
+        LoadedCharacter = _core.LoadedCharacterName;
     }
 
     [RelayCommand]
@@ -149,6 +163,12 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
         _core.Mu = value;
     }
 
+
+    partial void OnKlChanged(int value)
+    {
+        _core.Kl = value;
+    }
+
     partial void OnInChanged(int value)
     {
         _core.In = value;
@@ -162,6 +182,11 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
     partial void OnFfChanged(int value)
     {
         _core.Ff = value;
+    }
+
+    partial void OnKkChanged(int value)
+    {
+        _core.Kk = value;
     }
 
     partial void OnSkillWildnislebenChanged(int value)
@@ -182,6 +207,16 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
     partial void OnSkillTierkundeChanged(int value)
     {
         _core.SkillTierkunde = value;
+    }
+
+    partial void OnSkillFallenstellenChanged(int value)
+    {
+        _core.SkillFallenstellen = value;
+    }
+
+    partial void OnSkillFischenAngelnChanged(int value)
+    {
+        _core.SkillFischenAngeln = value;
     }
 
     partial void OnSkillFaehrtensuchenChanged(int value)
@@ -220,6 +255,8 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
         {
             CurrentLandscape = Landscapes[0];
         }
+
+        IsLocalKnowledge = false;
     }
 
     partial void OnCurrentLandscapeChanged(string value)
@@ -231,19 +268,24 @@ public partial class MainPageViewModel : ObservableObject, IRecipient<Charakter>
 
         _core.CurrentLandscape = Core.GetLandscape(value);
         string? terrain = _core.CurrentLandscape.Terrain;
-        DescriptionKnownTerrain = terrain ?? string.Empty;
+        DescriptionTerrainKnowledge = terrain ?? string.Empty;
 
-        IsKnownTerrain = _core.KnownTerrains.Length switch
+        IsTerrainKnowledge = _core.TerrainKnowledges.Length switch
         {
-            > 0 when terrain != null && _core.KnownTerrains.Contains(terrain) => true,
+            > 0 when terrain != null && _core.TerrainKnowledges.Contains(terrain) => true,
             > 0 => false,
-            _ => IsKnownTerrain
+            _ => IsTerrainKnowledge
         };
     }
 
-    partial void OnIsKnownTerrainChanged(bool value)
+    partial void OnIsTerrainKnowledgeChanged(bool value)
     {
-        _core.IsKnownTerrain = value;
+        _core.IsTerrainKnowledge = value;
+    }
+
+    partial void OnIsLocalKnowledgeChanged(bool value)
+    {
+        _core.IsLocalKnowledge = value;
     }
 
     #endregion environment
