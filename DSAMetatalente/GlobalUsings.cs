@@ -1,5 +1,6 @@
 global using System;
 global using System.Collections.ObjectModel;
+global using System.ComponentModel;
 global using System.Net;
 global using System.Reflection;
 global using System.Text.Json;
@@ -14,3 +15,4 @@ global using Windows.Foundation;
 global using Windows.Storage.Pickers;
 global using Windows.System;
 global using Windows.UI.ViewManagement;
+global using Microsoft.UI.Xaml.Input;

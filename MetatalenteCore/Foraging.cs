@@ -2,10 +2,7 @@ namespace Metatalente.Core;
 
 public class Foraging : MetatalentBase
 {
-    public Foraging()
-    {
-        SetSkill();
-    }
+    public Foraging() => SetSkill();
 
     public sealed override void SetSkill()
     {
@@ -34,9 +31,10 @@ public class Foraging : MetatalentBase
 
         if (pointsLeft > 0)
         {
-            amount = 1 + (pointsLeft / 3);
+            amount = 1 + pointsLeft / 3;
         }
 
-        LastResult = new(pointsLeft.ToString(), stringResult, amount.ToString() + " Rationen");
+        string textResult = amount + (amount == 1 ? "Ration" : " Rationen");
+        LastResult = new(pointsLeft.ToString(), stringResult, textResult);
     }
 }

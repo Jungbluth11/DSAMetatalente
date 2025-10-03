@@ -1,9 +1,8 @@
 namespace DSAMetatalente.ViewModels;
-
-public partial class TabForagingViewModel : ObservableObject
+public partial class TabFishingViewModel : ObservableObject
 {
     private readonly Core _core = Core.GetInstance();
-    private readonly Foraging _foraging = new();
+    private readonly Fishing _fishing = new();
     [ObservableProperty] private bool _canRoll = true;
     [ObservableProperty] private int _duration;
     [ObservableProperty] private int _minDuration;
@@ -11,39 +10,41 @@ public partial class TabForagingViewModel : ObservableObject
     [ObservableProperty] private string _pointsResult = string.Empty;
     [ObservableProperty] private string _textResult = string.Empty;
 
-    public TabForagingViewModel()
+    public TabFishingViewModel()
     {
         _core.PropertyChanged += Core_PropertyChanged;
-        Duration = _foraging.Duration;
-        MinDuration = _foraging.MinDuration;
+        Duration = _fishing.Duration;
+        MinDuration = _fishing.MinDuration;
+
     }
 
     private void Core_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is "CurrentRegion" or "CurrentLandscape" or "LoadCharacter")
+        if (e.PropertyName == "LoadCharacter")
         {
             CheckCanRoll();
+
         }
     }
 
     private void CheckCanRoll()
     {
-        _foraging.SetSkill();
 
-        CanRoll = _core.CurrentRegion.ForagingMod != null && _foraging.IsSet;
+        CanRoll = _fishing.IsSet;
     }
 
     partial void OnDurationChanged(int value)
     {
-        _foraging.Duration = value;
+        _fishing.Duration = value;
     }
+
 
     [RelayCommand]
     private void Roll()
     {
-        _foraging.Roll();
-        DiceResult = _foraging.LastResult.DiceResult;
-        PointsResult = _foraging.LastResult.PointsLeft;
-        TextResult = _foraging.LastResult.TextResult;
+        _fishing.Roll();
+        DiceResult = _fishing.LastResult.DiceResult;
+        PointsResult = _fishing.LastResult.PointsLeft;
+        TextResult = _fishing.LastResult.TextResult;
     }
 }

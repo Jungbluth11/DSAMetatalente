@@ -1,70 +1,408 @@
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using DSAUtils.HeldentoolInterop;
 using DSAUtils.Settings.Aventurien;
 
 namespace Metatalente.Core;
 
 public class Core : INotifyPropertyChanged
 {
-    internal Charakter? Character { get; private set; }
-    private readonly List<string> _knownTerrains = [];
-    private int _skillWildnisleben;
-    private int _skillSinnenschaerfe;
-    private int _skillPflanzenkunde;
-    private int _skillTierkunde;
+    private static Core? _instance;
+    private readonly List<string> _terrainKnowledges = [];
+    private int _ff = 8;
+    private int _ge = 8;
+    private int _in = 8;
+    private int _kk = 8;
+    private int _kl = 8;
+    private int _mu = 8;
     private int _skillFaehrtensuchen;
+    private int _skillFallenstellen;
+    private int _skillFischenAngeln;
+    private int _skillPflanzenkunde;
     private int _skillSchleichen;
     private int _skillSichVerstecken;
+    private int _skillSinnenschaerfe;
+    private int _skillTierkunde;
     private int _skillWeapon;
-    private Region _currentRegion = Regions[0];
+    private int _skillWildnisleben;
+    private string _loadedCharacterName = string.Empty;
     private Landscape _currentLandscape = Landscapes[0];
-    private int _mu = 8;
-    private int _in = 8;
-    private int _ge = 8;
-    private int _ff = 8;
+    private Region _currentRegion = Regions[0];
 
-    public int Mu
+    #region hard coded data
+
+    public static string[] Months =>
+    [
+        "Praios",
+        "Rondra",
+        "Efferd",
+        "Travia",
+        "Boron",
+        "Hesinde",
+        "Firun",
+        "Tsa",
+        "Phex",
+        "Peraine",
+        "Ingerimm",
+        "Rahja",
+        "Namenlose Tage"
+    ];
+
+    public static Region[] Regions =>
+    [
+        new(Occur.None, Occur.VeryRare, "Ewiges Eis", ["Eis"],
+        [
+            "Felsrobbe", "Firnyak", "Firnluchs", "Firunsbär", "Mammut", "Mastodon", "Meerkalb", "Schneedachs",
+            "Seetiger"
+        ], ["Alveranie", "Blutblatt", "Rattenpilz"]),
+        new(Occur.Rare, Occur.Modest, "Nördliche Tundra",
+            ["Eis", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche"],
+            [
+                "Felsrobbe", "Karen", "Pfeifhase", "Elch", "Firnluchs", "Firnyak", "Schneedachs", "Blaufuchs",
+                "Firunsbär", "Mammut", "Mastodon", "Meerkalb", "Seetiger", "Steppenhund", "Steppentiger"
+            ],
+            [
+                "Alveranie", "Blutblatt", "Kairan", "Bunter Mohn", "Rattenpilz", "Talaschin", "Vierblättrige Einbeere",
+                "Wirselkraut"
+            ]),
+        new(Occur.Modest, Occur.Modest, "Nördliche Grasländer und Steppen",
+            ["Hochland", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"],
+            [
+                "Karen", "Karnickel", "Steppenhund", "Gelbfuchs", "Pfeifhase", "Rebhuhn", "Rotpüschel", "Elch",
+                "Firunshirsch", "Klippechse", "Rotluchs", "Schneedachs", "Steppenrind", "Trappe", "Blaufuchs",
+                "Borkenbär", "Firnluchs", "Halmar-Antilope", "Mammut", "Orklandbär", "Steppentiger", "Vielfraß"
+            ],
+            [
+                "Alraune", "Alveranie", "Blutblatt", "Donf", "Egelschreck", "Eitriger Krötenschemel",
+                "Grüne Schleimschlange", "Gulmond", "Joruga", "Kairan", "Klippenzahn", "Madablüte", "Messergras",
+                "Bunter Mohn", "Naftanstaude", "Orklandbovist", "Rattenpilz", "Roter Drachenschlund", "Shurinstrauch",
+                "Tarnele", "Thonnys", "Tigermohn", "Traschbart", "Vierblättrige Einbeere", "Wirselkraut", "Zwölfblatt"
+            ]),
+        new(Occur.Modest, Occur.Modest, "Nördliches Hochland",
+            ["Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"],
+            [
+                "Orklandkarnickel", "Rebhuhn", "Gelbfuchs", "Halmar-Antilope", "Rotpüschel", "Trappe", "Klippechse",
+                "Orklandbär", "Rotfuchs", "Rotluchs", "Schreckkatze", "Sonnenluchs", "Borkenbär", "Mammut",
+                "Riesenaffe", "Steppentiger"
+            ],
+            [
+                "Alraune", "Alveranie", "Basilamine", "Blutblatt", "Eitriger Krötenschemel", "Grüne Schleimschlange",
+                "Gulmond", "Kairan", "Klippenzahn", "Messergras", "Bunter Mohn", "Naftanstaude", "Orklandbovist",
+                "Rattenpilz", "Shurinstrauch", "Tarnele", "Traschbart", "Vierblättrige Einbeere", "Wirselkraut",
+                "Zwölfblatt"
+            ]),
+        new(Occur.Rare, Occur.Rare, "Kalkgebirge",
+            [
+                "Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Wald", "Waldrand",
+                "Höhle (feucht)", "Höhle (trocken)"
+            ], ["Gebirgsbock", "Karnickel", "Berglöwe", "Höhlenbär", "Rotluchs", "Sonnenluchs"],
+            [
+                "Alveranie", "Atan-Kiefer", "Blutblatt", "Eitriger Krötenschemel", "Feuermoos und Efferdmoos",
+                "Gulmond",
+                "Joruga", "Kairan", "Madablüte", "Bleichmohn (Weißer Mohn)", "Grauer Mohn", "Nothilf", "Phosphorpilz",
+                "Rattenpilz", "Talaschin", "Tarnele", "Thonnys", "Traschbart", "Vierblättrige Einbeere",
+                "Vragieswurzel",
+                "Wirselkraut", "Zwölfblatt"
+            ]),
+        new(Occur.Rare, Occur.Rare, "Andere Mittelländische Gebirge",
+            [
+                "Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Wald", "Waldrand",
+                "Höhle (feucht)", "Höhle (trocken)"
+            ],
+            [
+                "Gebirgsbock", "Karnickel", "Pfeifhase", "Riesenlöffler", "Berglöwe", "Sonnenluchs", "Höhlenbär",
+                "Rotluchs"
+            ],
+            [
+                "Alveranie", "Blutblatt", "Eitriger Krötenschemel", "Feuermoos und Efferdmoos", "Gulmond", "Joruga",
+                "Kairan", "Madablüte", "Bleichmohn (Weißer Mohn)", "Grauer Mohn", "Nothilf", "Phosphorpilz",
+                "Rattenpilz",
+                "Schleimiger Sumpfknöterich", "Talaschin", "Tarnele", "Thonnys", "Traschbart", "Vierblättrige Einbeere",
+                "Vragieswurzel", "Wirselkraut", "Zwölfblatt"
+            ]),
+        new(Occur.Common, Occur.Common, "Nördliche Wälder (Westküste)",
+            ["Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"],
+            [
+                "Karnickel", "Rebhuhn", "Wildschwein", "Auerhahn", "Rehwild", "Streifendachs", "Fasan", "Kronenhirsch",
+                "Pfeifhase", "Rotfuchs", "Rotluchs", "Rotpüschel", "Auerochse", "Baumbär", "Blaufuchs", "Borkenbär",
+                "Vielfraß", "Waldlöwe", "Wildkatze", "Höhlenbär", "Riesenaffe", "Silberlöwe"
+            ],
+            [
+                "Alraune", "Alveranie", "Basilamine", "Belmart", "Blutblatt", "Carlog", "Efeuer",
+                "Eitriger Krötenschemel", "Gulmond", "Hollbeere", "Joruga", "Kairan", "Klippenzahn", "Mibelrohr",
+                "Orklandbovist", "Pestsporenpilz", "Rattenpilz", "Roter Drachenschlund", "Shurinstrauch", "Tarnele",
+                "Thonnys", "Traschbart", "Ulmenwürger", "Vierblättrige Einbeere", "Waldwebe", "Wirselkraut",
+                "Zunderschwamm", "Zwölfblatt"
+            ]),
+        new(Occur.Common, Occur.VeryCommon, "Nördliche Wälder (Taiga)",
+            ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"],
+            [
+                "Karnickel", "Wildschwein", "Fasan", "Pfeifhase", "Rebhuhn", "Rehwild", "Elch", "Rotluchs",
+                "Schneedachs", "Wildkatze", "Blaufuchs", "Firunshirsch", "Karen", "Kronenhirsch", "Schwarzbär",
+                "Sonnenluchs", "Streifendachs", "Vielfraß", "Waldlöwe", "Auerochse", "Borkenbär", "Rotfuchs",
+                "Silberlöwe"
+            ],
+            [
+                "Alraune", "Alveranie", "Belmart", "Blutblatt", "Efeuer", "Eitriger Krötenschemel", "Gulmond", "Joruga",
+                "Kairan", "Nothilf", "Pestsporenpilz", "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch",
+                "Schleimiger Sumpfknöterich", "Shurinstrauch", "Tarnele", "Thonnys", "Traschbart", "Ulmenwürger",
+                "Vierblättrige Einbeere", "Waldwebe", "Wirselkraut", "Zunderschwamm", "Zwölfblatt"
+            ]),
+        new(Occur.Common, Occur.VeryCommon, "Nördliche Wälder (Bornland)",
+            ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"],
+            [
+                "Pfeifhase", "Rehwild", "Silberbock", "Wildschwein", "Blaufuchs", "Elch", "Kronenhirsch", "Rebhuhn",
+                "Sonnenluchs", "Streifendachs", "Sumpfranze", "Auerochse", "Firunshirsch", "Höhlenbär", "Riesenaffe",
+                "Rotluchs", "Schneedachs", "Schwarzbär", "Vielfraß", "Waldlöwe", "Wildkatze"
+            ],
+            [
+                "Alraune", "Alveranie", "Belmart", "Blutblatt", "Efeuer", "Eitriger Krötenschemel", "Gulmond", "Joruga",
+                "Kairan", "Nothilf", "Pestsporenpilz", "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch",
+                "Schleimiger Sumpfknöterich", "Tarnele", "Thonnys", "Ulmenwürger", "Vierblättrige Einbeere", "Waldwebe",
+                "Wasserrausch", "Wirselkraut", "Zunderschwamm", "Zwölfblatt"
+            ]),
+        new(Occur.Modest, Occur.Rare, "Nördliche Sümpfe, Marschen und Moore",
+            ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor", "Waldrand"],
+            ["Karnickel", "Klippechse", "Sumpfranze"],
+            [
+                "Alraune", "Alveranie", "Blutblatt", "Carlog", "Donf", "Egelschreck", "Eitriger Krötenschemel",
+                "Grüne Schleimschlange", "Iribaarslilie", "Kairan", "Mibelrohr", "Morgendornstrauch", "Neckerkraut",
+                "Pestsporenpilz", "Rahjalieb", "Rattenpilz", "Schleimiger Sumpfknöterich", "Schlinggras", "Tarnele",
+                "Traschbart", "Vierblättrige Einbeere", "Wirselkraut", "Zwölfblatt"
+            ]),
+        new(Occur.Common, Occur.Common, "Mittelländische Grasländer, Heide und Steppe",
+            ["Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"],
+            [
+                "Pfeifhase", "Rotpüschel", "Gänseluchs", "Rebhuhn", "Trappe", "Fasan", "Gelbfuchs", "Gabelantilope",
+                "Sonnenluchs", "Wildkatze", "Steppentiger"
+            ],
+            [
+                "Alraune", "Alveranie", "Blutblatt", "Chonchinis", "Donf", "Egelschreck", "Eitriger Krötenschemel",
+                "Gulmond", "Hiradwurz", "Ilmenblatt", "Joruga", "Kairan",
+                "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus",
+                "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Lulanie", "Messergras", "Mibelrohr", "Mirbelstein",
+                "Bunter Mohn", "Purpurmohn", "Schwarzer Mohn", "Tigermohn", "Naftanstaude", "Neckerkraut", "Rahjalieb",
+                "Rattenpilz", "Roter Drachenschlund", "Schlangenzünglein", "Schwarmschwamm", "Shurinstrauch", "Tarnele",
+                "Vierblättrige Einbeere", "Winselgras", "Wirselkraut", "Zwölfblatt"
+            ]),
+        new(Occur.Common, Occur.Common, "Mittelländische Wälder (Gemäßigtes Klima)",
+            ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"],
+            [
+                "Karnickel", "Rehwild", "Riesenlöffler", "Wildschwein", "Gänseluchs", "Pfeifhase", "Rebhuhn",
+                "Rotpüschel", "Auerhahn", "Fasan", "Kronenhirsch", "Rotfuchs", "Streifendachs", "Auerochse", "Baumbär",
+                "Höhlenbär", "Rotluchs", "Schwarzbär", "Silberbock", "Wildkatze", "Silberlöwe"
+            ],
+            [
+                "Alraune", "Alveranie", "Belmart", "Blutblatt", "Carlog", "Chonchinis", "Efeuer", "Egelschreck",
+                "Eitriger Krötenschemel", "Gulmond", "Ilmenblatt", "Joruga", "Kairan",
+                "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus",
+                "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Lulanie", "Mibelrohr", "Mirbelstein",
+                "Neckerkraut", "Quasselwurz", "Rahjalieb", "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch",
+                "Schleimiger Sumpfknöterich", "Shurinstrauch", "Tarnele", "Traschbart", "Ulmenwürger",
+                "Vierblättrige Einbeere", "Vragieswurzel", "Waldwebe", "Wirselkraut", "Zunderschwamm", "Zwölfblatt"
+            ]),
+        new(Occur.Common, Occur.Common, "Mittelländische Wälder (Yaquirisches Klima)",
+            ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"],
+            [
+                "Karnickel", "Rehwild", "Riesenlöffler", "Rotfuchs", "Rotpüschel", "Wildschwein", "Gänseluchs",
+                "Rebhuhn", "Regenbogenfasan", "Rotluchs", "Baumbär", "Raschtulsluchs", "Streifendachs", "Wildkatze"
+            ],
+            [
+                "Alraune", "Alveranie", "Arganstrauch", "Belmart", "Blutblatt", "Boronsschlinge", "Carlog",
+                "Chonchinis", "Efeuer", "Egelschreck", "Eitriger Krötenschemel", "Ilmenblatt", "Joruga", "Kairan",
+                "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus",
+                "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Lulanie", "Mibelrohr", "Purpurmohn",
+                "Schwarzer Mohn", "Neckerkraut", "Quasselwurz", "Rahjalieb", "Rattenpilz", "Roter Drachenschlund",
+                "Satuariensbusch", "Shurinstrauch", "Tarnele", "Traschbart", "Ulmenwürger", "Vierblättrige Einbeere",
+                "Vragieswurzel", "Waldwebe", "Zunderschwamm", "Zwölfblatt"
+            ]),
+        new(Occur.Common, Occur.Modest, "Mittelländische Wälder (Tobrisches Klima)",
+            ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"],
+            [
+                "Rehwild", "Riesenlöffler", "Rotpüschel", "Auerhahn", "Fasan", "Rebhuhn", "Rotfuchs", "Wildkatze",
+                "Wildschwein", "Auerochse", "Baumbär", "Riesenaffe"
+            ],
+            [
+                "Alraune", "Alveranie", "Belmart", "Blutblatt", "Chonchinis", "Efeuer", "Egelschreck",
+                "Eitriger Krötenschemel", "Gulmond", "Ilmenblatt", "Joruga", "Kairan", "Mirbelstein", "Purpurmohn",
+                "Quasselwurz", "Rahjalieb", "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch", "Schwarmschwamm",
+                "Tarnele", "Traschbart", "Tuur-Amash-Kelch", "Ulmenwürger", "Vierblättrige Einbeere", "Waldwebe",
+                "Wasserrausch", "Zunderschwamm", "Zwölfblatt"
+            ]),
+        new(Occur.Common, Occur.Common, "Immergrüne Wälder (Südosten)",
+            ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"],
+            [
+                "Rehwild", "Riesenlöffler", "Rotpüschel", "Auerhahn", "Ongalobulle", "Raschtulsluchs", "Rebhuhn",
+                "Regenbogenfasan", "Rotfuchs", "Warzenschwein", "Al'Kebir-Antilope", "Baumbär", "Springbock",
+                "Wildkatze", "Moosaffe", "Riesenaffe"
+            ],
+            [
+                "Alraune", "Alveranie", "Blutblatt", "Chonchinis", "Dornrose", "Efeuer", "Egelschreck",
+                "Eitriger Krötenschemel", "Ilmenblatt", "Joruga", "Kairan",
+                "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus",
+                "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Purpurmohn", "Quasselwurz", "Rahjalieb",
+                "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch", "Schwarzer Wein", "Shurinstrauch", "Tarnele",
+                "Traschbart", "Waldwebe", "Zunderschwamm", "Zwölfblatt"
+            ]),
+        new(Occur.Common, Occur.Modest, "Südländische Grasländer und Steppen",
+            [
+                "Wüste und Wüstenrand", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald",
+                "Waldrand"
+            ],
+            [
+                "Al'Kebir-Antilope", "Gabelantilope", "Springbock", "Khômgepard", "Ongalobulle", "Raschtulsluchs",
+                "Strauß",
+                "Warzenschwein", "Fasan", "Gelbfuchs", "Regenbogenfasan", "Rehwild", "Rotpüschel", "Sandlöwe"
+            ],
+            [
+                "Alraune", "Alveranie", "Atmon", "Blutblatt", "Chonchinis", "Dornrose", "Eitriger Krötenschemel",
+                "Finage",
+                "Hiradwurz", "Jagdgras", "Kairan", "Khôm- oder Mhanadiknolle", "Menchal-Kaktus", "Merach-Strauch",
+                "Messergras", "Mirbelstein", "Bunter Mohn", "Purpurmohn", "Naftanstaude", "Olginwurz", "Rattenpilz",
+                "Schlangenzünglein", "Schwarzer Wein", "Shurinstrauch", "Talaschin", "Tarnele", "Winselgras",
+                "Wirselkraut",
+                "Yaganstrauch", "Zithabar", "Zwölfblatt"
+            ]),
+        new(Occur.Rare, Occur.Rare, "Wüstenrandgebiete",
+            ["Wüste und Wüstenrand", "Steppe", "Grasland, Wiesen", "Wald", "Waldrand"],
+            [
+                "Gabelantilope", "Springbock", "Al'Kebir-Antilope", "Rotpüschel", "Khômgepard", "Sandlöwe", "Strauß",
+                "Raschtulsluchs"
+            ],
+            [
+                "Alveranie", "Atmon", "Blutblatt", "Cheria-Kaktus", "Chonchinis", "Eitriger Krötenschemel", "Finage",
+                "Hiradwurz", "Khôm- oder Mhanadiknolle", "Menchal-Kaktus", "Merach-Strauch", "Messergras", "Purpurmohn",
+                "Naftanstaude", "Olginwurz", "Rattenpilz", "Shurinstrauch", "Talaschin", "Tarnele", "Winselgras",
+                "Wirselkraut", "Zwölfblatt"
+            ]),
+        new(Occur.VeryRare, Occur.VeryRare, "Wüste", ["Wüste und Wüstenrand"], ["Sandlöwe"],
+        [
+            "Alveranie", "Blutblatt", "Cheria-Kaktus", "Khôm- oder Mhanadiknolle", "Menchal-Kaktus", "Rattenpilz",
+            "Talaschin"
+        ]),
+        new(Occur.Rare, Occur.Rare, "Südländische Gebirge",
+            ["Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Wald", "Waldrand"],
+            ["Raschtulsluchs"],
+            [
+                "Alveranie", "Atmon", "Blutblatt", "Eitriger Krötenschemel", "Kairan", "Bleichmohn (Weißer Mohn)",
+                "Olginwurz", "Rattenpilz", "Talaschin", "Tarnele", "Vierblättrige Einbeere", "Wirselkraut"
+            ]),
+        new(Occur.Modest, Occur.Common, "Maraskan",
+            [
+                "Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor",
+                "Regenwald", "Wald", "Waldrand"
+            ],
+            [
+                "Riesenlöffler", "Otan-Otan", "Rotpüschel", "Vy'Tagga-Antilope", "Wildschwein",
+                "Maraskanisches Stachelschwein", "Baumschleimer", "Baumwürger", "Rehwild", "Riesenaffe"
+            ],
+            [
+                "Alraune", "Alveranie", "Axorda-Baum", "Blutblatt", "Disdychonda", "Eitriger Krötenschemel", "Horusche",
+                "Jagdgras", "Kairan", "Rattenpilz", "Rauschgurke", "Schlangenzünglein", "Shurinstrauch", "Tarnblatt",
+                "Tarnele", "Trichterwurzel", "Wirselkraut", "Yaganstrauch"
+            ]),
+        new(Occur.Rare, Occur.Rare, "Südliche Sümpfe",
+            [
+                "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Küste, Strand", "Flussauen", "Sumpf und Moor",
+                "Wald",
+                "Waldrand"
+            ], ["Sumpfranze"],
+            [
+                "Alveranie", "Arganstrauch", "Atmon", "Blutblatt", "Carlog", "Chonchinis", "Disdychonda", "Donf",
+                "Egelschreck", "Eitriger Krötenschemel", "Iribaarslilie", "Kairan", "Kajubo",
+                "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus",
+                "Grauer Lotus",
+                "Weißer Lotus", "Weißgelber Lotus", "Mirhamer Seidenliane", "Rahjalieb", "Rattenpilz",
+                "Rote Pfeilblüte",
+                "Sansaro", "Schleichender Tod", "Wirselkraut", "Zwölfblatt"
+            ]),
+        new(Occur.VeryCommon, Occur.VeryCommon, "Regenwald",
+            [
+                "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Küste, Strand", "Flussauen", "Regenwald", "Wald",
+                "Waldrand"
+            ],
+            [
+                "Moosaffe", "Otan-Otan", "Löwenaffe", "Purzelaffe", "Fleckenpanther", "Zwergelefant",
+                "Brabaker Waldelefant", "Dschungeltiger", "Lioma", "Riesenaffe"
+            ],
+            [
+                "Alveranie", "Arganstrauch", "Blutblatt", "Boronie", "Boronsschlinge", "Carlog", "Cheria-Kaktus",
+                "Disdychonda", "Eitriger Krötenschemel", "Finage", "Höllenkraut", "Ilmenblatt", "Kairan", "Kajubo",
+                "Kukuka", "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus",
+                "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Merach-Strauch", "Mirhamer Seidenliane", "Orazal",
+                "Quinja", "Rahjalieb", "Rattenpilz", "Rote Pfeilblüte", "Schleichender Tod", "Shurinstrauch",
+                "Vragieswurzel", "Waldwebe", "Wirselkraut", "Würgedattel", "Zunderschwamm"
+            ]),
+        new(Occur.Modest, Occur.Modest, "Südliche Regengebirge",
+            [
+                "Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Regenwald", "Wald",
+                "Waldrand",
+                "Höhle (feucht)"
+            ],
+            [
+                "Karnickel", "Löwenaffe", "Purzelaffe", "Moosaffe", "Otan-Otan", "Fleckenpanther", "Dschungeltiger",
+                "Riesenaffe"
+            ],
+            [
+                "Alveranie", "Atmon", "Blutblatt", "Eitriger Krötenschemel", "Feuermoos und Efferdmoos", "Finage",
+                "Höllenkraut", "Ilmenblatt", "Kukuka", "Merach-Strauch", "Mirhamer Seidenliane",
+                "Bleichmohn (Weißer Mohn)",
+                "Grauer Mohn", "Orazal", "Rattenpilz", "Schleichender Tod", "Vierblättrige Einbeere", "Vragieswurzel"
+            ]),
+        new(Occur.None, Occur.Modest, "Ifirns Ozean", ["Meer"], [], []),
+        new(Occur.None, Occur.Common, "Meer der Sieben Winde", ["Meer"], [], []),
+        new(Occur.None, Occur.Modest, "Südmeer (Feuermeer)", ["Meer"], [], []),
+        new(Occur.None, Occur.Common, "Perlenmeer", ["Meer"], [], ["Feuerschlick", "Sansaro"])
+    ];
+
+    public static Landscape[] Landscapes =>
+    [
+        new("Eis", "Eiskundig"),
+        new("Wüste und Wüstenrand", "Wüstenkundig"),
+        new("Gebirge", "Gebirgskundig"),
+        new("Hochland"),
+        new("Steppe", "Steppenkundig"),
+        new("Flussauen"),
+        new("Fluss- und Seeufer, Teiche"),
+        new("Grasland, Wiesen"),
+        new("Höhle (feucht)", "Höhlenkundig"),
+        new("Höhle (trocken)", "Höhlenkundig"),
+        new("Küste, Strand"),
+        new("Meer", "Meereskundig"),
+        new("Regenwald", "Dschungelkundig"),
+        new("Sumpf und Moor", "Sumpfkundig"),
+        new("Wald", "Waldkundig"),
+        new("Waldrand", "Waldkundig")
+    ];
+
+    #endregion hard coded data
+
+    public Landscape CurrentLandscape
     {
-        get => _mu;
+        get => _currentLandscape;
         set
         {
-            if (value == _mu)
+            if (value.Equals(_currentLandscape))
             {
                 return;
             }
 
-            _mu = value;
+            _currentLandscape = value;
             OnPropertyChanged();
         }
     }
 
-    public int In
+    public string CurrentMonth { get; set; } = Months[0];
+
+    public Region CurrentRegion
     {
-        get => _in;
+        get => _currentRegion;
         set
         {
-            if (value == _in)
+            if (value.Equals(_currentRegion))
             {
                 return;
             }
 
-            _in = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public int Ge
-    {
-        get => _ge;
-        set
-        {
-            if (value == _ge)
-            {
-                return;
-            }
-
-            _ge = value;
+            _currentRegion = value;
             OnPropertyChanged();
         }
     }
@@ -84,62 +422,96 @@ public class Core : INotifyPropertyChanged
         }
     }
 
-    public int SkillWildnisleben
+    public int Ge
     {
-        get => _skillWildnisleben;
+        get => _ge;
         set
         {
-            if (value == _skillWildnisleben)
+            if (value == _ge)
             {
                 return;
             }
 
-            _skillWildnisleben = value;
+            _ge = value;
             OnPropertyChanged();
         }
     }
 
-    public int SkillSinnenschaerfe
+    public int In
     {
-        get => _skillSinnenschaerfe;
+        get => _in;
         set
         {
-            if (value == _skillSinnenschaerfe)
+            if (value == _in)
             {
                 return;
             }
 
-            _skillSinnenschaerfe = value;
+            _in = value;
             OnPropertyChanged();
         }
     }
 
-    public int SkillPflanzenkunde
+    public bool IsHeldenToolInstalled => HeldentoolInterop.IsInstalled();
+    public bool IsLocalKnowledge { get; set; }
+    public bool IsTerrainKnowledge { get; set; }
+
+    public int Kk
     {
-        get => _skillPflanzenkunde;
+        get => _kk;
         set
         {
-            if (value == _skillPflanzenkunde)
+            if (value == _kk)
             {
                 return;
             }
 
-            _skillPflanzenkunde = value;
+            _kk = value;
             OnPropertyChanged();
         }
     }
 
-    public int SkillTierkunde
+    public int Kl
     {
-        get => _skillTierkunde;
+        get => _kl;
         set
         {
-            if (value == _skillTierkunde)
+            if (value == _kl)
             {
                 return;
             }
 
-            _skillTierkunde = value;
+            _kl = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string LoadedCharacterName
+    {
+        get => _loadedCharacterName;
+        set
+        {
+            if (value == _loadedCharacterName)
+            {
+                return;
+            }
+
+            _loadedCharacterName = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int Mu
+    {
+        get => _mu;
+        set
+        {
+            if (value == _mu)
+            {
+                return;
+            }
+
+            _mu = value;
             OnPropertyChanged();
         }
     }
@@ -155,6 +527,51 @@ public class Core : INotifyPropertyChanged
             }
 
             _skillFaehrtensuchen = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillFallenstellen
+    {
+        get => _skillFallenstellen;
+        set
+        {
+            if (value == _skillFallenstellen)
+            {
+                return;
+            }
+
+            _skillFallenstellen = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillFischenAngeln
+    {
+        get => _skillFischenAngeln;
+        set
+        {
+            if (value == _skillFischenAngeln)
+            {
+                return;
+            }
+
+            _skillFischenAngeln = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillPflanzenkunde
+    {
+        get => _skillPflanzenkunde;
+        set
+        {
+            if (value == _skillPflanzenkunde)
+            {
+                return;
+            }
+
+            _skillPflanzenkunde = value;
             OnPropertyChanged();
         }
     }
@@ -189,6 +606,36 @@ public class Core : INotifyPropertyChanged
         }
     }
 
+    public int SkillSinnenschaerfe
+    {
+        get => _skillSinnenschaerfe;
+        set
+        {
+            if (value == _skillSinnenschaerfe)
+            {
+                return;
+            }
+
+            _skillSinnenschaerfe = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int SkillTierkunde
+    {
+        get => _skillTierkunde;
+        set
+        {
+            if (value == _skillTierkunde)
+            {
+                return;
+            }
+
+            _skillTierkunde = value;
+            OnPropertyChanged();
+        }
+    }
+
     public int SkillWeapon
     {
         get => _skillWeapon;
@@ -204,230 +651,37 @@ public class Core : INotifyPropertyChanged
         }
     }
 
+    public int SkillWildnisleben
+    {
+        get => _skillWildnisleben;
+        set
+        {
+            if (value == _skillWildnisleben)
+            {
+                return;
+            }
+
+            _skillWildnisleben = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string[] TerrainKnowledges => [.. _terrainKnowledges];
+
     public string[] Terrains => Sonderfertigkeiten.GetByGroup(Sonderfertigkeitengruppe.Gelaendekunde);
-    public string[] KnownTerrains => [.. _knownTerrains];
-    public string CurrentMonth { get; set; } = Months[0];
-    public bool IsHeldenToolInstalled => HeldentoolInterop.IsInstalled();
-    public bool IsKnownTerrain { get; set; }
-
-    public Region CurrentRegion
-    {
-        get => _currentRegion;
-        set
-        {
-            if (value.Equals(_currentRegion)) return;
-
-            _currentRegion = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public Landscape CurrentLandscape
-    {
-        get => _currentLandscape;
-        set
-        {
-            if (value.Equals(_currentLandscape)) return;
-
-            _currentLandscape = value;
-            OnPropertyChanged();
-        }
-    }
-
-
-    private static Core? _instance;
-
-    #region hard coded data
-
-    public static string[] Months =>
-    [
-        "Praios",
-        "Rondra",
-        "Efferd",
-        "Travia",
-        "Boron",
-        "Hesinde",
-        "Firun",
-        "Tsa",
-        "Phex",
-        "Peraine",
-        "Ingerimm",
-        "Rahja",
-        "Namenlose Tage"
-    ];
-    public static Region[] Regions =>
-    [
-        new(Occur.None, Occur.VeryRare, "Ewiges Eis", ["Eis"], ["Felsrobbe", "Firnyak", "Firnluchs", "Firunsbär", "Mammut", "Mastodon", "Meerkalb", "Schneedachs", "Seetiger"], ["Alveranie", "Blutblatt", "Rattenpilz"]),
-        new(Occur.Rare, Occur.Modest, "Nördliche Tundra", ["Eis", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche"], ["Felsrobbe", "Karen", "Pfeifhase", "Elch", "Firnluchs", "Firnyak", "Schneedachs", "Blaufuchs", "Firunsbär", "Mammut", "Mastodon", "Meerkalb", "Seetiger", "Steppenhund", "Steppentiger"], ["Alveranie", "Blutblatt", "Kairan", "Bunter Mohn", "Rattenpilz", "Talaschin", "Vierblättrige Einbeere", "Wirselkraut"]),
-        new(Occur.Modest, Occur.Modest, "Nördliche Grasländer und Steppen", ["Hochland", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Karen", "Karnickel", "Steppenhund", "Gelbfuchs", "Pfeifhase", "Rebhuhn", "Rotpüschel", "Elch", "Firunshirsch", "Klippechse", "Rotluchs", "Schneedachs", "Steppenrind", "Trappe", "Blaufuchs", "Borkenbär", "Firnluchs", "Halmar-Antilope", "Mammut", "Orklandbär", "Steppentiger", "Vielfraß"], ["Alraune", "Alveranie", "Blutblatt", "Donf", "Egelschreck", "Eitriger Krötenschemel", "Grüne Schleimschlange", "Gulmond", "Joruga", "Kairan", "Klippenzahn", "Madablüte", "Messergras", "Bunter Mohn", "Naftanstaude", "Orklandbovist", "Rattenpilz", "Roter Drachenschlund", "Shurinstrauch", "Tarnele", "Thonnys", "Tigermohn", "Traschbart", "Vierblättrige Einbeere", "Wirselkraut", "Zwölfblatt"]),
-        new(Occur.Modest, Occur.Modest, "Nördliches Hochland", ["Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Orklandkarnickel", "Rebhuhn", "Gelbfuchs", "Halmar-Antilope", "Rotpüschel", "Trappe", "Klippechse", "Orklandbär", "Rotfuchs", "Rotluchs", "Schreckkatze", "Sonnenluchs", "Borkenbär", "Mammut", "Riesenaffe", "Steppentiger"], ["Alraune", "Alveranie", "Basilamine", "Blutblatt", "Eitriger Krötenschemel", "Grüne Schleimschlange", "Gulmond", "Kairan", "Klippenzahn", "Messergras", "Bunter Mohn", "Naftanstaude", "Orklandbovist", "Rattenpilz", "Shurinstrauch", "Tarnele", "Traschbart", "Vierblättrige Einbeere", "Wirselkraut", "Zwölfblatt"]),
-        new(Occur.Rare, Occur.Rare, "Kalkgebirge", ["Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Wald", "Waldrand", "Höhle (feucht)", "Höhle (trocken)"], ["Gebirgsbock", "Karnickel", "Berglöwe", "Höhlenbär", "Rotluchs", "Sonnenluchs"], ["Alveranie", "Atan-Kiefer", "Blutblatt", "Eitriger Krötenschemel", "Feuermoos und Efferdmoos", "Gulmond", "Joruga", "Kairan", "Madablüte", "Bleichmohn (Weißer Mohn)", "Grauer Mohn", "Nothilf", "Phosphorpilz", "Rattenpilz", "Talaschin", "Tarnele", "Thonnys", "Traschbart", "Vierblättrige Einbeere", "Vragieswurzel", "Wirselkraut", "Zwölfblatt"]),
-        new(Occur.Rare, Occur.Rare, "Andere Mittelländische Gebirge", ["Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Wald", "Waldrand", "Höhle (feucht)", "Höhle (trocken)"], ["Gebirgsbock", "Karnickel", "Pfeifhase", "Riesenlöffler", "Berglöwe", "Sonnenluchs", "Höhlenbär", "Rotluchs"], ["Alveranie", "Blutblatt", "Eitriger Krötenschemel", "Feuermoos und Efferdmoos", "Gulmond", "Joruga", "Kairan", "Madablüte", "Bleichmohn (Weißer Mohn)", "Grauer Mohn", "Nothilf", "Phosphorpilz", "Rattenpilz", "Schleimiger Sumpfknöterich", "Talaschin", "Tarnele", "Thonnys", "Traschbart", "Vierblättrige Einbeere", "Vragieswurzel", "Wirselkraut", "Zwölfblatt"]),
-        new(Occur.Common, Occur.Common, "Nördliche Wälder (Westküste)", ["Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Karnickel", "Rebhuhn", "Wildschwein", "Auerhahn", "Rehwild", "Streifendachs", "Fasan", "Kronenhirsch", "Pfeifhase", "Rotfuchs", "Rotluchs", "Rotpüschel", "Auerochse", "Baumbär", "Blaufuchs", "Borkenbär", "Vielfraß", "Waldlöwe", "Wildkatze", "Höhlenbär", "Riesenaffe", "Silberlöwe"], ["Alraune", "Alveranie", "Basilamine", "Belmart", "Blutblatt", "Carlog", "Efeuer", "Eitriger Krötenschemel", "Gulmond", "Hollbeere", "Joruga", "Kairan", "Klippenzahn", "Mibelrohr", "Orklandbovist", "Pestsporenpilz", "Rattenpilz", "Roter Drachenschlund", "Shurinstrauch", "Tarnele", "Thonnys", "Traschbart", "Ulmenwürger", "Vierblättrige Einbeere", "Waldwebe", "Wirselkraut", "Zunderschwamm", "Zwölfblatt"]),
-        new(Occur.Common, Occur.VeryCommon, "Nördliche Wälder (Taiga)", ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Karnickel", "Wildschwein", "Fasan", "Pfeifhase", "Rebhuhn", "Rehwild", "Elch", "Rotluchs", "Schneedachs", "Wildkatze", "Blaufuchs", "Firunshirsch", "Karen", "Kronenhirsch", "Schwarzbär", "Sonnenluchs", "Streifendachs", "Vielfraß", "Waldlöwe", "Auerochse", "Borkenbär", "Rotfuchs", "Silberlöwe"], ["Alraune", "Alveranie", "Belmart", "Blutblatt", "Efeuer", "Eitriger Krötenschemel", "Gulmond", "Joruga", "Kairan", "Nothilf", "Pestsporenpilz", "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch", "Schleimiger Sumpfknöterich", "Shurinstrauch", "Tarnele", "Thonnys", "Traschbart", "Ulmenwürger", "Vierblättrige Einbeere", "Waldwebe", "Wirselkraut", "Zunderschwamm", "Zwölfblatt"]),
-        new(Occur.Common, Occur.VeryCommon, "Nördliche Wälder (Bornland)", ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Pfeifhase", "Rehwild", "Silberbock", "Wildschwein", "Blaufuchs", "Elch", "Kronenhirsch", "Rebhuhn", "Sonnenluchs", "Streifendachs", "Sumpfranze", "Auerochse", "Firunshirsch", "Höhlenbär", "Riesenaffe", "Rotluchs", "Schneedachs", "Schwarzbär", "Vielfraß", "Waldlöwe", "Wildkatze"], ["Alraune", "Alveranie", "Belmart", "Blutblatt", "Efeuer", "Eitriger Krötenschemel", "Gulmond", "Joruga", "Kairan", "Nothilf", "Pestsporenpilz", "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch", "Schleimiger Sumpfknöterich", "Tarnele", "Thonnys", "Ulmenwürger", "Vierblättrige Einbeere", "Waldwebe", "Wasserrausch", "Wirselkraut", "Zunderschwamm", "Zwölfblatt"]),
-        new(Occur.Modest, Occur.Rare, "Nördliche Sümpfe, Marschen und Moore", ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor", "Waldrand"], ["Karnickel", "Klippechse", "Sumpfranze"], ["Alraune", "Alveranie", "Blutblatt", "Carlog", "Donf", "Egelschreck", "Eitriger Krötenschemel", "Grüne Schleimschlange", "Iribaarslilie", "Kairan", "Mibelrohr", "Morgendornstrauch", "Neckerkraut", "Pestsporenpilz", "Rahjalieb", "Rattenpilz", "Schleimiger Sumpfknöterich", "Schlinggras", "Tarnele", "Traschbart", "Vierblättrige Einbeere", "Wirselkraut", "Zwölfblatt"])
-        ,new(Occur.Common, Occur.Common, "Mittelländische Grasländer, Heide und Steppe", ["Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Pfeifhase", "Rotpüschel", "Gänseluchs", "Rebhuhn", "Trappe", "Fasan", "Gelbfuchs", "Gabelantilope", "Sonnenluchs", "Wildkatze", "Steppentiger"], ["Alraune", "Alveranie", "Blutblatt", "Chonchinis", "Donf", "Egelschreck", "Eitriger Krötenschemel", "Gulmond", "Hiradwurz", "Ilmenblatt", "Joruga", "Kairan", "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus", "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Lulanie", "Messergras", "Mibelrohr", "Mirbelstein", "Bunter Mohn", "Purpurmohn", "Schwarzer Mohn", "Tigermohn", "Naftanstaude", "Neckerkraut", "Rahjalieb", "Rattenpilz", "Roter Drachenschlund", "Schlangenzünglein", "Schwarmschwamm", "Shurinstrauch", "Tarnele", "Vierblättrige Einbeere", "Winselgras", "Wirselkraut", "Zwölfblatt"]),
-        new(Occur.Common, Occur.Common, "Mittelländische Wälder (Gemäßigtes Klima)", ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Karnickel", "Rehwild", "Riesenlöffler", "Wildschwein", "Gänseluchs", "Pfeifhase", "Rebhuhn", "Rotpüschel", "Auerhahn", "Fasan", "Kronenhirsch", "Rotfuchs", "Streifendachs", "Auerochse", "Baumbär", "Höhlenbär", "Rotluchs", "Schwarzbär", "Silberbock", "Wildkatze", "Silberlöwe"], ["Alraune", "Alveranie", "Belmart", "Blutblatt", "Carlog", "Chonchinis", "Efeuer", "Egelschreck", "Eitriger Krötenschemel", "Gulmond", "Ilmenblatt", "Joruga", "Kairan", "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus", "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Lulanie", "Mibelrohr", "Mirbelstein", "Neckerkraut", "Quasselwurz", "Rahjalieb", "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch", "Schleimiger Sumpfknöterich", "Shurinstrauch", "Tarnele", "Traschbart", "Ulmenwürger", "Vierblättrige Einbeere", "Vragieswurzel", "Waldwebe", "Wirselkraut", "Zunderschwamm", "Zwölfblatt"]),
-        new(Occur.Common, Occur.Common, "Mittelländische Wälder (Yaquirisches Klima)", ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Karnickel", "Rehwild", "Riesenlöffler", "Rotfuchs", "Rotpüschel", "Wildschwein", "Gänseluchs", "Rebhuhn", "Regenbogenfasan", "Rotluchs", "Baumbär", "Raschtulsluchs", "Streifendachs", "Wildkatze"], ["Alraune", "Alveranie", "Arganstrauch", "Belmart", "Blutblatt", "Boronsschlinge", "Carlog", "Chonchinis", "Efeuer", "Egelschreck", "Eitriger Krötenschemel", "Ilmenblatt", "Joruga", "Kairan", "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus", "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Lulanie", "Mibelrohr", "Purpurmohn", "Schwarzer Mohn", "Neckerkraut", "Quasselwurz", "Rahjalieb", "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch", "Shurinstrauch", "Tarnele", "Traschbart", "Ulmenwürger", "Vierblättrige Einbeere", "Vragieswurzel", "Waldwebe", "Zunderschwamm", "Zwölfblatt"]),
-        new(Occur.Common, Occur.Modest, "Mittelländische Wälder (Tobrisches Klima)", ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Rehwild", "Riesenlöffler", "Rotpüschel", "Auerhahn", "Fasan", "Rebhuhn", "Rotfuchs", "Wildkatze", "Wildschwein", "Auerochse", "Baumbär", "Riesenaffe"], ["Alraune", "Alveranie", "Belmart", "Blutblatt", "Chonchinis", "Efeuer", "Egelschreck", "Eitriger Krötenschemel", "Gulmond", "Ilmenblatt", "Joruga", "Kairan", "Mirbelstein", "Purpurmohn", "Quasselwurz", "Rahjalieb", "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch", "Schwarmschwamm", "Tarnele", "Traschbart", "Tuur-Amash-Kelch", "Ulmenwürger", "Vierblättrige Einbeere", "Waldwebe", "Wasserrausch", "Zunderschwamm", "Zwölfblatt"]),
-        new(Occur.Common, Occur.Common, "Immergrüne Wälder (Südosten)", ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Rehwild", "Riesenlöffler", "Rotpüschel", "Auerhahn", "Ongalobulle", "Raschtulsluchs", "Rebhuhn", "Regenbogenfasan", "Rotfuchs", "Warzenschwein", "Al'Kebir-Antilope", "Baumbär", "Springbock", "Wildkatze", "Moosaffe", "Riesenaffe"], ["Alraune", "Alveranie", "Blutblatt", "Chonchinis", "Dornrose", "Efeuer", "Egelschreck", "Eitriger Krötenschemel", "Ilmenblatt", "Joruga", "Kairan", "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus", "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Purpurmohn", "Quasselwurz", "Rahjalieb", "Rattenpilz", "Roter Drachenschlund", "Satuariensbusch", "Schwarzer Wein", "Shurinstrauch", "Tarnele", "Traschbart", "Waldwebe", "Zunderschwamm", "Zwölfblatt"]),
-        new(Occur.Common, Occur.Modest, "Südländische Grasländer und Steppen", ["Wüste und Wüstenrand", "Steppe", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Wald", "Waldrand"], ["Al'Kebir-Antilope", "Gabelantilope", "Springbock", "Khômgepard", "Ongalobulle", "Raschtulsluchs", "Strauß", "Warzenschwein", "Fasan", "Gelbfuchs", "Regenbogenfasan", "Rehwild", "Rotpüschel", "Sandlöwe"], ["Alraune", "Alveranie", "Atmon", "Blutblatt", "Chonchinis", "Dornrose", "Eitriger Krötenschemel", "Finage", "Hiradwurz", "Jagdgras", "Kairan", "Khôm- oder Mhanadiknolle", "Menchal-Kaktus", "Merach-Strauch", "Messergras", "Mirbelstein", "Bunter Mohn", "Purpurmohn", "Naftanstaude", "Olginwurz", "Rattenpilz", "Schlangenzünglein", "Schwarzer Wein", "Shurinstrauch", "Talaschin", "Tarnele", "Winselgras", "Wirselkraut", "Yaganstrauch", "Zithabar", "Zwölfblatt"]),
-        new(Occur.Rare, Occur.Rare, "Wüstenrandgebiete", ["Wüste und Wüstenrand", "Steppe", "Grasland, Wiesen", "Wald", "Waldrand"], ["Gabelantilope", "Springbock", "Al'Kebir-Antilope", "Rotpüschel", "Khômgepard", "Sandlöwe", "Strauß", "Raschtulsluchs"], ["Alveranie", "Atmon", "Blutblatt", "Cheria-Kaktus", "Chonchinis", "Eitriger Krötenschemel", "Finage", "Hiradwurz", "Khôm- oder Mhanadiknolle", "Menchal-Kaktus", "Merach-Strauch", "Messergras", "Purpurmohn", "Naftanstaude", "Olginwurz", "Rattenpilz", "Shurinstrauch", "Talaschin", "Tarnele", "Winselgras", "Wirselkraut", "Zwölfblatt"]),
-        new(Occur.VeryRare, Occur.VeryRare, "Wüste", ["Wüste und Wüstenrand"], ["Sandlöwe"], ["Alveranie", "Blutblatt", "Cheria-Kaktus", "Khôm- oder Mhanadiknolle", "Menchal-Kaktus", "Rattenpilz", "Talaschin"]),
-        new(Occur.Rare, Occur.Rare, "Südländische Gebirge", ["Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Wald", "Waldrand"], ["Raschtulsluchs"], ["Alveranie", "Atmon", "Blutblatt", "Eitriger Krötenschemel", "Kairan", "Bleichmohn (Weißer Mohn)", "Olginwurz", "Rattenpilz", "Talaschin", "Tarnele", "Vierblättrige Einbeere", "Wirselkraut"]),
-        new(Occur.Modest, Occur.Common, "Maraskan", ["Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Flussauen", "Sumpf und Moor", "Regenwald", "Wald", "Waldrand"], ["Riesenlöffler", "Otan-Otan", "Rotpüschel", "Vy'Tagga-Antilope", "Wildschwein", "Maraskanisches Stachelschwein", "Baumschleimer", "Baumwürger", "Rehwild", "Riesenaffe"], ["Alraune", "Alveranie", "Axorda-Baum", "Blutblatt", "Disdychonda", "Eitriger Krötenschemel", "Horusche", "Jagdgras", "Kairan", "Rattenpilz", "Rauschgurke", "Schlangenzünglein", "Shurinstrauch", "Tarnblatt", "Tarnele", "Trichterwurzel", "Wirselkraut", "Yaganstrauch"]),
-        new(Occur.Rare, Occur.Rare, "Südliche Sümpfe", ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Küste, Strand", "Flussauen", "Sumpf und Moor", "Wald", "Waldrand"], ["Sumpfranze"], ["Alveranie", "Arganstrauch", "Atmon", "Blutblatt", "Carlog", "Chonchinis", "Disdychonda", "Donf", "Egelschreck", "Eitriger Krötenschemel", "Iribaarslilie", "Kairan", "Kajubo", "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus", "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Mirhamer Seidenliane", "Rahjalieb", "Rattenpilz", "Rote Pfeilblüte", "Sansaro", "Schleichender Tod", "Wirselkraut", "Zwölfblatt"]),
-        new(Occur.VeryCommon, Occur.VeryCommon, "Regenwald", ["Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Küste, Strand", "Flussauen", "Regenwald", "Wald", "Waldrand"], ["Moosaffe", "Otan-Otan", "Löwenaffe", "Purzelaffe", "Fleckenpanther", "Zwergelefant", "Brabaker Waldelefant", "Dschungeltiger", "Lioma", "Riesenaffe"], ["Alveranie", "Arganstrauch", "Blutblatt", "Boronie", "Boronsschlinge", "Carlog", "Cheria-Kaktus", "Disdychonda", "Eitriger Krötenschemel", "Finage", "Höllenkraut", "Ilmenblatt", "Kairan", "Kajubo", "Kukuka", "Färberlotus (Gelber, Blauer, Roter und Rosa Lotus)", "Purpurner Lotus", "Schwarzer Lotus", "Grauer Lotus", "Weißer Lotus", "Weißgelber Lotus", "Merach-Strauch", "Mirhamer Seidenliane", "Orazal", "Quinja", "Rahjalieb", "Rattenpilz", "Rote Pfeilblüte", "Schleichender Tod", "Shurinstrauch", "Vragieswurzel", "Waldwebe", "Wirselkraut", "Würgedattel", "Zunderschwamm"]),
-        new(Occur.Modest, Occur.Modest, "Südliche Regengebirge", ["Gebirge", "Hochland", "Grasland, Wiesen", "Fluss- und Seeufer, Teiche", "Regenwald", "Wald", "Waldrand", "Höhle (feucht)"], ["Karnickel", "Löwenaffe", "Purzelaffe", "Moosaffe", "Otan-Otan", "Fleckenpanther", "Dschungeltiger", "Riesenaffe"], ["Alveranie", "Atmon", "Blutblatt", "Eitriger Krötenschemel", "Feuermoos und Efferdmoos", "Finage", "Höllenkraut", "Ilmenblatt", "Kukuka", "Merach-Strauch", "Mirhamer Seidenliane", "Bleichmohn (Weißer Mohn)", "Grauer Mohn", "Orazal", "Rattenpilz", "Schleichender Tod", "Vierblättrige Einbeere", "Vragieswurzel"]),
-        new(Occur.None, Occur.Modest, "Ifirns Ozean", ["Meer"], [], []),
-        new(Occur.None, Occur.Common, "Meer der Sieben Winde", ["Meer"], [], []),
-        new(Occur.None, Occur.Modest, "Südmeer (Feuermeer)", ["Meer"], [], []),
-        new(Occur.None, Occur.Common, "Perlenmeer", ["Meer"], [], ["Feuerschlick", "Sansaro"])
-    ];
-
-    public static Landscape[] Landscapes =>
-    [
-        new("Eis", "Eiskundig"),
-        new("Wüste und Wüstenrand", "Wüstenkundig"),
-        new("Gebirge", "Gebirgskundig"),
-        new("Hochland"),
-        new("Steppe", "Steppenkundig"),
-        new("Flussauen"),
-        new("Fluss- und Seeufer, Teiche"),
-        new("Grasland, Wiesen"),
-        new("Höhle (feucht)", "Höhlenkundig"),
-        new("Höhle (trocken)", "Höhlenkundig"),
-        new("Küste, Strand"),
-        new("Meer", "Meereskundig"),
-        new("Regenwald", "Dschungelkundig"),
-        new("Sumpf und Moor", "Sumpfkundig"),
-        new("Wald", "Waldkundig"),
-        new("Waldrand", "Waldkundig")
-    ];
-
-    #endregion hard coded data
-
-    public event PropertyChangedEventHandler? PropertyChanged;
+    internal Charakter? Character { get; private set; }
 
     private Core()
     {
-
     }
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new(propertyName));
-    }
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public static Core GetInstance()
     {
         _instance ??= new();
+
         return _instance;
-    }
-
-    public Charakter[] GetCharactersFromTool()
-    {
-        return IsHeldenToolInstalled ? HeldentoolInterop.Load() : throw new("\"Heldentool\" is not installed.");
-    }
-
-    public void LoadCharacterFromFile(string filename)
-    {
-        LoadCharacter(HeldentoolInterop.LoadFromXML(filename));
-    }
-
-    public void LoadCharacter(Charakter character)
-    {
-        Character = character;
-        _knownTerrains.Clear();
-        IsKnownTerrain = false;
-
-        foreach (Ability ability in character.Eigenschaften)
-        {
-            switch (ability.Name)
-            {
-                case "Mut":
-                    Mu = ability.Wert;
-                    break;
-                case "Intuition":
-                    In = ability.Wert;
-                    break;
-                case "Fingerfertigkeit":
-                    Ff = ability.Wert;
-                    break;
-                case "Gewandtheit":
-                    Ge = ability.Wert;
-                    break;
-            }
-        }
-
-        foreach (Ability ability in character.Talente)
-        {
-            switch (ability.Name)
-            {
-                case "Wildnisleben":
-                    SkillWildnisleben = ability.Wert;
-                    break;
-                case "Sinnenschärfe":
-                    SkillSinnenschaerfe = ability.Wert;
-                    break;
-                case "Pflanzenkunde":
-                    SkillPflanzenkunde = ability.Wert;
-                    break;
-                case "Tierkunde":
-                    SkillTierkunde = ability.Wert;
-                    break;
-                case "Fährtensuchen":
-                    SkillFaehrtensuchen = ability.Wert;
-                    break;
-                case "Schleichen":
-                    SkillSchleichen = ability.Wert;
-                    break;
-                case "Sich verstecken":
-                    SkillSichVerstecken = ability.Wert;
-                    break;
-            }
-        }
-
-        foreach (string sonderfertigkeit in character.Sonderfertigkeiten)
-        {
-            if (Terrains.Contains(sonderfertigkeit))
-            {
-                _knownTerrains.Add(sonderfertigkeit);
-            }
-        }
-
-        if (CurrentLandscape.Terrain != null)
-        {
-            IsKnownTerrain = _knownTerrains.Contains(CurrentLandscape.Terrain);
-        }
-
-        OnPropertyChanged();
-    }
-
-    public void AddKnownTerrain(string terrain)
-    {
-        if (Terrains.Contains(terrain))
-        {
-            _knownTerrains.Add(terrain);
-        }
-        else
-        {
-            throw new ArgumentException(nameof(terrain) + " is invalid");
-        }
-    }
-
-    public static Region GetRegion(string regionName)
-    {
-        foreach (Region region in Regions)
-        {
-            if (region.Name == regionName)
-            {
-                return region;
-            }
-        }
-
-        throw new ArgumentException(nameof(regionName) + " is invalid");
     }
 
     public static Landscape GetLandscape(string landscapeName)
@@ -443,6 +697,19 @@ public class Core : INotifyPropertyChanged
         throw new ArgumentException(nameof(landscapeName) + " is invalid");
     }
 
+    public static Region GetRegion(string regionName)
+    {
+        foreach (Region region in Regions)
+        {
+            if (region.Name == regionName)
+            {
+                return region;
+            }
+        }
+
+        throw new ArgumentException(nameof(regionName) + " is invalid");
+    }
+
     public static string OccurToString(int occur)
     {
         return occur switch
@@ -452,7 +719,131 @@ public class Core : INotifyPropertyChanged
             4 => "gelegentlich",
             8 => "selten",
             16 => "sehr selten",
-            _ => "kein Vorkommen",
+            _ => "kein Vorkommen"
         };
+    }
+
+    public void AddTerrainKnowledge(string terrain)
+    {
+        if (Terrains.Contains(terrain))
+        {
+            _terrainKnowledges.Add(terrain);
+        }
+        else
+        {
+            throw new ArgumentException(nameof(terrain) + " is invalid");
+        }
+    }
+
+    public Charakter[] GetCharactersFromTool()
+    {
+        return IsHeldenToolInstalled ? HeldentoolInterop.Load() : throw new("\"Heldentool\" is not installed.");
+    }
+
+    public void LoadCharacter(Charakter character)
+    {
+        Character = character;
+        LoadedCharacterName = character.Name;
+        _terrainKnowledges.Clear();
+        IsTerrainKnowledge = false;
+
+        foreach (Ability ability in character.Eigenschaften)
+        {
+            switch (ability.Name)
+            {
+                case "Mut":
+                    Mu = ability.Wert;
+
+                    break;
+                case "KLugheit":
+                    Kl = ability.Wert;
+
+                    break;
+                case "Intuition":
+                    In = ability.Wert;
+
+                    break;
+                case "Fingerfertigkeit":
+                    Ff = ability.Wert;
+
+                    break;
+                case "Gewandtheit":
+                    Ge = ability.Wert;
+
+                    break;
+                case "Körperkraft":
+                    Kk = ability.Wert;
+
+                    break;
+            }
+        }
+
+        foreach (Ability ability in character.Talente)
+        {
+            switch (ability.Name)
+            {
+                case "Wildnisleben":
+                    SkillWildnisleben = ability.Wert;
+
+                    break;
+                case "Sinnenschärfe":
+                    SkillSinnenschaerfe = ability.Wert;
+
+                    break;
+                case "Pflanzenkunde":
+                    SkillPflanzenkunde = ability.Wert;
+
+                    break;
+                case "Tierkunde":
+                    SkillTierkunde = ability.Wert;
+
+                    break;
+                case "Fährtensuchen":
+                    SkillFaehrtensuchen = ability.Wert;
+
+                    break;
+                case "Schleichen":
+                    SkillSchleichen = ability.Wert;
+
+                    break;
+                case "Sich verstecken":
+                    SkillSichVerstecken = ability.Wert;
+
+                    break;
+                case "Fallen stellen":
+                    SkillFallenstellen = ability.Wert;
+
+                    break;
+                case "Fischen/Angeln":
+                    SkillFischenAngeln = ability.Wert;
+
+                    break;
+            }
+        }
+
+        foreach (string sonderfertigkeit in character.Sonderfertigkeiten)
+        {
+            if (Terrains.Contains(sonderfertigkeit))
+            {
+                _terrainKnowledges.Add(sonderfertigkeit);
+            }
+        }
+
+        if (CurrentLandscape.Terrain != null)
+        {
+            IsTerrainKnowledge = _terrainKnowledges.Contains(CurrentLandscape.Terrain);
+        }
+
+        OnPropertyChanged();
+    }
+
+    public void LoadCharacterFromFile(string filename)
+    {
+        LoadCharacter(HeldentoolInterop.LoadFromXML(filename));
+    }
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new(propertyName));
     }
 }

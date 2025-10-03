@@ -1,15 +1,13 @@
-using System.ComponentModel;
-
 namespace DSAMetatalente.ViewModels;
 
 public partial class TabHuntingViewModel : ObservableObject
 {
+    private readonly Core _core = Core.GetInstance();
+    private readonly Hunting _hunting = new();
     [ObservableProperty] private bool _canRoll = true;
     [ObservableProperty] private bool _coincidence;
     [ObservableProperty] private bool _isMeisterschuetze;
     [ObservableProperty] private bool _isScharfschuetze;
-    private readonly Core _core = Core.GetInstance();
-    private readonly Hunting _hunting = new();
     [ObservableProperty] private int _duration;
     [ObservableProperty] private int _minDuration;
     [ObservableProperty] private int _skillWeapon;
@@ -31,16 +29,9 @@ public partial class TabHuntingViewModel : ObservableObject
         Duration = _hunting.Duration;
         MinDuration = _hunting.MinDuration;
         UsedWeapon = _hunting.UsedWeapon.Name;
-    }
-
-    private void CheckCanRoll()
-    {
-        _hunting.SetSkill();
-
-        if (_core.CurrentRegion.WildlifeMod != null)
-        {
-            CanRoll = _hunting.IsSet;
-        }
+#if DEBUG
+        SkillWeapon = 20;
+#endif
     }
 
     private void Core_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -59,6 +50,16 @@ public partial class TabHuntingViewModel : ObservableObject
                 LoadCharacter();
 
                 break;
+        }
+    }
+
+    private void CheckCanRoll()
+    {
+        _hunting.SetSkill();
+
+        if (_core.CurrentRegion.WildlifeMod != null)
+        {
+            CanRoll = _hunting.IsSet;
         }
     }
 

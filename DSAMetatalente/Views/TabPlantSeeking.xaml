@@ -35,6 +35,7 @@
             Grid.Column="1"
             Margin="10"
             IsEnabled="{Binding CanRoll}"
+            KeyDown="UIElement_OnKeyDown"
             Minimum="{Binding MinDuration}"
             SpinButtonPlacementMode="Compact"
             Value="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
@@ -60,7 +61,7 @@
             Margin="10"
             VerticalAlignment="Center"
             Content="Zufall"
-            IsChecked="{Binding Coincidence}"
+            IsChecked="{Binding Coincidence, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             IsEnabled="{Binding CanRoll}" />
         <ComboBox
             Grid.Row="1"

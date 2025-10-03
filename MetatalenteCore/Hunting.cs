@@ -1,9 +1,3 @@
-// Ignore Spelling: Scharfschuetze Meisterschuetze
-
-using System.Text.RegularExpressions;
-using System.Xml;
-using DSAUtils.HeldentoolInterop;
-
 namespace Metatalente.Core;
 
 public class Hunting : MetatalentBase
@@ -147,10 +141,7 @@ public class Hunting : MetatalentBase
 
     #endregion hard coded data
 
-    public Hunting()
-    {
-        SetSkill();
-    }
+    public Hunting() => SetSkill();
 
     public sealed override void SetSkill()
     {
@@ -233,13 +224,14 @@ public class Hunting : MetatalentBase
                 diceResult += resultStrings[1];
             }
 
-            textResult += amount + " Rationen";
+            textResult += amount + (amount == 1 ? "Ration" : " Rationen");
         }
         else
         {
             int huntedAnimals = 0;
             int[] quantityTotal = [];
             string[] quantityStrings = [];
+
             for (int i = 0; i < intervall; i++)
             {
                 (int pointsResult, string[] resultStrings) = GetRollData(mod, i, intervall > 1);
@@ -264,9 +256,10 @@ public class Hunting : MetatalentBase
                 {
                     quantityTotal[j] += result.quantityData[j];
                 }
+
+                textResult = huntedAnimals + (huntedAnimals == 1 ? " Tier" : " Tiere") + "\n\n";
             }
 
-            textResult = huntedAnimals + (huntedAnimals > 1 ? " Tiere" : " Tier") + "\n\n";
 
             for (int i = 0; i < quantityTotal.Length; i++)
             {

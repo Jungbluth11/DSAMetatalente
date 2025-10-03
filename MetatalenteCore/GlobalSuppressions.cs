@@ -5,10 +5,11 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "namespace", Target = "~N:DSAMetatalente.Core")]
-[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "type", Target = "~T:DSAMetatalente.Core.MetatalentBase")]
-[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~P:DSAMetatalente.Core.Hunting.IsScharfschuetze")]
-[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~P:DSAMetatalente.Core.Hunting.IsMeisterschuetze")]
-[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~P:DSAMetatalente.Core.Core.SkillSinnenschaerfe")]
-[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~P:DSAMetatalente.Core.Core.SkillFaehrtensuchen")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "namespace", Target = "~N:Metatalente.Core")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "type", Target = "~T:Metatalente.Core.MetatalentBase")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~P:Metatalente.Core.Hunting.IsScharfschuetze")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~P:Metatalente.Core.Hunting.IsMeisterschuetze")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~P:Metatalente.Core.Core.SkillSinnenschaerfe")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~P:Metatalente.Core.Core.SkillFaehrtensuchen")]
 [assembly: SuppressMessage("Interoperability", "CA1416:Plattformkompatibilität überprüfen", Justification = "<Ausstehend>", Scope = "member", Target = "~M:DSAMetatalente.Core.MetatalentBase.SetSkill(System.String[])")]
+[assembly: SuppressMessage("Naming", "VSSpell001:Spell Check", Justification = "<Ausstehend>", Scope = "member", Target = "~P:Metatalente.Core.Core.TerrainKnowledges")]

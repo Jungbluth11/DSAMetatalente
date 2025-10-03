@@ -28,8 +28,8 @@
       ThemeService;
       SkiaRenderer;
     </UnoFeatures>
-    <AssemblyVersion>2.0.1.0</AssemblyVersion>
-    <FileVersion>2.0.1.0</FileVersion>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <FileVersion>2.1.0.0</FileVersion>
     <AssemblyName>Metatalente</AssemblyName>
     <DefaultLanguage>de</DefaultLanguage>
     <Version>2.0.1</Version>
@@ -91,6 +91,21 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\AboutDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\TabSetTraps.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\UserControl1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\TabFishing.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

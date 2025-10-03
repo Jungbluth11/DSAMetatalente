@@ -1,5 +1,6 @@
 namespace Metatalente.Core;
 
+[DebuggerDisplay("{Name}")]
 public readonly record struct Animal(int Difficulty, string Name, string[] Loot)
 {
     public string Name { get; } = Name ?? throw new ArgumentNullException(nameof(Name));

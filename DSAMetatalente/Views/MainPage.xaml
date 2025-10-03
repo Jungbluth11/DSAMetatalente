@@ -28,10 +28,20 @@
                     <MenuFlyoutItem
                         Click="MenuCharacterLoadFromTool_OnClick"
                         IsEnabled="{Binding CanLoadFromTool}"
-                        Text="... aus Heldentool" />
+                        Text="... aus Helden-Software" />
                     <MenuFlyoutItem Click="MenuCharacterLoadFromFile_OnClick" Text="... aus Datei" />
                 </MenuBarItem>
                 <MenuBarItem Title="Option">
+                    <MenuFlyoutSubItem Text="Zusätzliche Tabs">
+                        <ToggleMenuFlyoutItem
+                            x:Name="MenuTabSetTraps"
+                            Click="MenuTabSetTraps_OnClick"
+                            Text="Fallen stellen" />
+                        <ToggleMenuFlyoutItem
+                            x:Name="MenuTabFishing"
+                            Click="MenuTabFishing_OnClick"
+                            Text="Fischen/Angeln" />
+                    </MenuFlyoutSubItem>
                     <MenuFlyoutSubItem Text="Theme">
                         <RadioMenuFlyoutItem
                             x:Name="MenuThemeLight"
@@ -74,48 +84,102 @@
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
                 <TextBlock Margin="10,10,0,10" Text="MU" />
-                <NumberBox SpinButtonPlacementMode="Compact" Value="{Binding Mu, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <NumberBox
+                    KeyDown="UIElement_OnKeyDown"
+                    SpinButtonPlacementMode="Compact"
+                    Value="{Binding Mu, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <TextBlock
+                    x:Name="TextKl"
+                    Margin="10,10,0,10"
+                    Text="KL"
+                    Visibility="Collapsed" />
+                <NumberBox
+                    x:Name="NumberBoxKl"
+                    KeyDown="UIElement_OnKeyDown"
+                    SpinButtonPlacementMode="Compact"
+                    Visibility="Collapsed"
+                    Value="{Binding Kl, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 <TextBlock Margin="20,10,0,10" Text="IN" />
-                <NumberBox SpinButtonPlacementMode="Compact" Value="{Binding In, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <NumberBox
+                    KeyDown="UIElement_OnKeyDown"
+                    SpinButtonPlacementMode="Compact"
+                    Value="{Binding In, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 <TextBlock Margin="20,10,0,10" Text="GE" />
-                <NumberBox SpinButtonPlacementMode="Compact" Value="{Binding Ge, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <NumberBox
+                    KeyDown="UIElement_OnKeyDown"
+                    SpinButtonPlacementMode="Compact"
+                    Value="{Binding Ge, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 <TextBlock Margin="20,10,0,10" Text="FF" />
-                <NumberBox SpinButtonPlacementMode="Compact" Value="{Binding Ff, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <NumberBox
+                    KeyDown="UIElement_OnKeyDown"
+                    SpinButtonPlacementMode="Compact"
+                    Value="{Binding Ff, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <TextBlock
+                    x:Name="TextKk"
+                    Margin="10,10,0,10"
+                    Text="KK"
+                    Visibility="Collapsed" />
+                <NumberBox
+                    x:Name="NumberBoxKk"
+                    KeyDown="UIElement_OnKeyDown"
+                    SpinButtonPlacementMode="Compact"
+                    Visibility="Collapsed"
+                    Value="{Binding Kk, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="0">
-                <StackPanel Height="220">
-                    <controls:SkillControl Text="Wildnisleben" Value="{Binding SkillWildnisleben, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <StackPanel Height="275">
+                    <controls:SkillControl
+                        x:Name="SkillWildnisleben"
+                        KeyDown="UIElement_OnKeyDown"
+                        Text="Wildnisleben"
+                        Value="{Binding SkillWildnisleben, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <controls:SkillControl
                         x:Name="SkillSinnenschaerfe"
+                        KeyDown="UIElement_OnKeyDown"
                         Text="Sinnenschärfe"
                         Value="{Binding SkillSinnenschaerfe, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <controls:SkillControl
                         x:Name="SkillPflanzenkunde"
+                        KeyDown="UIElement_OnKeyDown"
                         Text="Pflanzenkunde"
                         Value="{Binding SkillPflanzenkunde, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <controls:SkillControl
                         x:Name="SkillTierkunde"
+                        KeyDown="UIElement_OnKeyDown"
                         Text="Tierkunde"
                         Value="{Binding SkillTierkunde, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <controls:SkillControl
                         x:Name="SkillFaehrtensuchen"
+                        KeyDown="UIElement_OnKeyDown"
                         Text="Fährtensuchen"
                         Value="{Binding SkillFaehrtensuchen, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <controls:SkillControl
                         x:Name="SkillSchleichen"
+                        KeyDown="UIElement_OnKeyDown"
                         Text="Schleichen"
                         Value="{Binding SkillSchleichen, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     <controls:SkillControl
                         x:Name="SkillSichVerstecken"
+                        KeyDown="UIElement_OnKeyDown"
                         Text="Sich Verstecken"
                         Value="{Binding SkillSichVerstecken, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <controls:SkillControl
+                        x:Name="SkillFallenstellen"
+                        KeyDown="UIElement_OnKeyDown"
+                        Text="Fallen stellen"
+                        Value="{Binding SkillFallenstellen, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <controls:SkillControl
+                        x:Name="SkillFischenAngeln"
+                        KeyDown="UIElement_OnKeyDown"
+                        Text="Fischen/Angeln"
+                        Value="{Binding SkillFischenAngeln, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </StackPanel>
                 <gb:GroupBox
                     Margin="5,0,0,0"
                     Header="Geländekunden"
                     IsEnabled="False"
                     Theme="Fluent">
-                    <ItemsControl ItemsSource="{Binding KnownTerrains, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <ItemsControl ItemsSource="{Binding TerrainKnowledges, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </gb:GroupBox>
             </StackPanel>
             <Grid Grid.Row="1" Grid.Column="1">
@@ -124,6 +188,7 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
@@ -171,9 +236,15 @@
                     Grid.Column="1"
                     Margin="10"
                     Content="Geländekunde vorhanden"
-                    IsChecked="{Binding IsKnownTerrain, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                <gb:GroupBox
+                    IsChecked="{Binding IsTerrainKnowledge, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <CheckBox
                     Grid.Row="4"
+                    Grid.Column="1"
+                    Margin="10"
+                    Content="Ortskenntnis"
+                    IsChecked="{Binding IsTerrainKnowledge, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <gb:GroupBox
+                    Grid.Row="5"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Margin="10"
@@ -218,7 +289,7 @@
                             Grid.Row="2"
                             Grid.Column="1"
                             Margin="10"
-                            Text="{Binding DescriptionKnownTerrain}" />
+                            Text="{Binding DescriptionTerrainKnowledge}" />
                     </Grid>
                 </gb:GroupBox>
             </Grid>
@@ -227,6 +298,7 @@
                 Grid.Row="0"
                 Grid.RowSpan="2"
                 Grid.Column="2"
+                CanDragTabs="True"
                 IsAddTabButtonVisible="False"
                 SelectionChanged="TabView_OnSelectionChanged">
                 <TabView.TabItems>

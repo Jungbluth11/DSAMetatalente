@@ -1,9 +1,9 @@
 namespace DSAMetatalente.ViewModels;
 
-public partial class TabForagingViewModel : ObservableObject
+public partial class TabSetTrapsViewModel : ObservableObject
 {
     private readonly Core _core = Core.GetInstance();
-    private readonly Foraging _foraging = new();
+    private readonly SetTraps _setTraps = new();
     [ObservableProperty] private bool _canRoll = true;
     [ObservableProperty] private int _duration;
     [ObservableProperty] private int _minDuration;
@@ -11,16 +11,16 @@ public partial class TabForagingViewModel : ObservableObject
     [ObservableProperty] private string _pointsResult = string.Empty;
     [ObservableProperty] private string _textResult = string.Empty;
 
-    public TabForagingViewModel()
+    public TabSetTrapsViewModel()
     {
+        Duration = _setTraps.Duration;
+        MinDuration = _setTraps.MinDuration;
         _core.PropertyChanged += Core_PropertyChanged;
-        Duration = _foraging.Duration;
-        MinDuration = _foraging.MinDuration;
     }
 
     private void Core_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is "CurrentRegion" or "CurrentLandscape" or "LoadCharacter")
+        if (e.PropertyName == "LoadCharacter")
         {
             CheckCanRoll();
         }
@@ -28,22 +28,20 @@ public partial class TabForagingViewModel : ObservableObject
 
     private void CheckCanRoll()
     {
-        _foraging.SetSkill();
-
-        CanRoll = _core.CurrentRegion.ForagingMod != null && _foraging.IsSet;
+        CanRoll = _core.CurrentRegion.WildlifeMod != null && _setTraps.IsSet;
     }
 
     partial void OnDurationChanged(int value)
     {
-        _foraging.Duration = value;
+        _setTraps.Duration = value;
     }
 
     [RelayCommand]
     private void Roll()
     {
-        _foraging.Roll();
-        DiceResult = _foraging.LastResult.DiceResult;
-        PointsResult = _foraging.LastResult.PointsLeft;
-        TextResult = _foraging.LastResult.TextResult;
+        _setTraps.Roll();
+        DiceResult = _setTraps.LastResult.DiceResult;
+        PointsResult = _setTraps.LastResult.PointsLeft;
+        TextResult = _setTraps.LastResult.TextResult;
     }
 }

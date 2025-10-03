@@ -1,5 +1,6 @@
 namespace Metatalente.Core;
 
+[DebuggerDisplay("{Name}")]
 public readonly record struct Plant
 {
     public int IdentificationMod { get; }
