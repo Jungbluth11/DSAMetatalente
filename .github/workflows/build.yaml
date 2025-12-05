@@ -35,15 +35,13 @@ jobs:
       - name: Get Version from Project File
         id: get-version
         shell: bash
-        run: |
-          cd DSAMetatalente
-          echo "version=$(grep -oE '<Version>[^<]+' DSAMetatalente.csproj | sed 's/<Version>//')" >> $GITHUB_OUTPUT
+        run: echo "version=$(grep -oE '<Version>[^<]+' DSAMetatalente/DSAMetatalente.csproj | sed 's/<Version>//')" >> $GITHUB_OUTPUT
 
       - name: Build for Linux
-        run: dotnet build -c Release --os linux --self-contained -o ../publish/linux/usr/bin/dsametatalente
+        run: dotnet build DSAMetatalente/DSAMetatalente.csproj -c Release --os linux --self-contained -o publish/linux/usr/bin/dsametatalente
 
       - name: Build for Windows
-        run: dotnet build -c Release --os win --self-contained -o ../publish/windows/
+        run: dotnet build DSAMetatalente/DSAMetatalente.csproj -c Release --os win --self-contained -o publish/windows/
 
       - name: Create packages
         shell: bash
