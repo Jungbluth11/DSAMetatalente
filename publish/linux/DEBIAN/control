@@ -1,0 +1,8 @@
+Package: DSAMetatalente
+Version: 2.0.1
+Architecture: all
+Essential: no
+Priority: optional
+Depends: dotnet-runtime-9.0
+Maintainer: Jungbluth
+Description: DSA Metatalente ist ein Generator fuer Metatalente, der alle Berechnungen uebernimmt und somit langwieriges Blaettern in Regelbuechern und ewiges Wuerfeln ueberflüssig macht. 

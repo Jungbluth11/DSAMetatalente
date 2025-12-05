@@ -1,0 +1,67 @@
+name: "Build"
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.gitignore"
+      - "**/*.gitattributes"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_NOLOGO: true
+      DOTNET_GENERATE_ASPNET_CERTIFICATE: false
+      DOTNET_ADD_GLOBAL_TOOLS_TO_PATH: false
+      DOTNET_MULTILEVEL_LOOKUP: 0
+      DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION: true
+      TERM: xterm
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Get Version from Project File
+        id: get-version
+        shell: bash
+        run: echo "version=$(grep -oE '<Version>[^<]+' DSAMetatalente/DSAMetatalente.csproj | sed 's/<Version>//')" >> $GITHUB_OUTPUT
+
+      - name: Build for Linux
+        run: dotnet build -c Release --os linux --nologo --self-contained -o publish/linux/usr/bin/dsametatalente
+
+      - name: Build for Windows
+        run: dotnet build -c Release --os win --nologo --self-contained -o publish/windows/
+
+      - name: Create packages
+        shell: bash
+        run: |
+          dpkg-deb --build publish/linux/ dsametatalente_${{ steps.get-version.outputs.version }}.deb
+          zip -r dsametatalente_${{ steps.get-version.outputs.version }}_windows.zip publish/windows/
+
+      - name: Create Release
+        run: |
+          gh release create v${{ steps.get-version.outputs.version }} \
+            dsametatalente_${{ steps.get-version.outputs.version }}.deb \
+            dsametatalente_${{ steps.get-version.outputs.version }}_windows.zip \
+            --title "v${{ steps.get-version.outputs.version }}" \
+            --notes "Release v${{ steps.get-version.outputs.version }}"
+
+      - name : Clean up packages
+        run: |
+          rm -rf publish/linux/usr/bin/dsametatalente
+          rm -rf publish/windows/*
+          rm dsametatalente_${{ steps.get-version.outputs.version }}.deb
+          rm dsametatalente_${{ steps.get-version.outputs.version }}_windows.zip
+          
+
